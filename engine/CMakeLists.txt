@@ -21,6 +21,13 @@ target_compile_definitions(voxlet_header_engine INTERFACE
 	VOXLET_VERSION_PATCH=${PROJECT_VERSION_PATCH}
 )
 
+if (PROJECT_IS_TOP_LEVEL AND ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+	if (MSVC)
+		target_compile_options(voxlet_header_engine INTERFACE /W4)
+	else()
+		target_compile_options(voxlet_header_engine INTERFACE -Wall -Wextra -Wpedantic)
+	endif()
+endif()
 
 # source files of the engine
 file(GLOB_RECURSE VOXLET_SOURCE_FILES ${VOXLET_ENGINE_DIR}/src/*.cpp)

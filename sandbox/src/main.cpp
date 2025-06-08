@@ -1,4 +1,5 @@
 #include <expected>
+#include <format>
 
 #include <voxlet/application.hpp>
 
@@ -13,26 +14,26 @@ class SandboxApp final : public vx::Application {
 		}
 
 
-		auto onStartup() noexcept -> vx::Result override {
-			return vx::Result::eSuccess;
+		auto onStartup() noexcept -> vx::Failable<void> override {
+			return {};
 		}
 
-		auto onUpdate(vx::Milliseconds) noexcept -> vx::Result override {
-			return vx::Result::eSuccess;
+		auto onUpdate(vx::Milliseconds) noexcept -> vx::Failable<void> override {
+			return {};
 		}
 
-		auto onRender() noexcept -> vx::Result override {
-			return vx::Result::eSuccess;
+		auto onRender() noexcept -> vx::Failable<void> override {
+			return {};
 		}
 
-		auto onShutdown() noexcept -> vx::Result override {
-			return vx::Result::eSuccess;
+		auto onShutdown() noexcept -> vx::Failable<void> override {
+			return {};
 		}
 };
 
 auto vx::createApplication([[maybe_unused]] std::span<char *const> args) noexcept
 	-> vx::Failable<std::unique_ptr<vx::Application>>
-{
+{ 
 	return std::make_unique<SandboxApp> ();
 }
 

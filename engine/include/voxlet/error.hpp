@@ -11,20 +11,22 @@
 #include <type_traits>
 #include <utility>
 
+#include <flex/pipes/toString.hpp>
+#include <flex/pipes/transform.hpp>
+#include <flex/pipes/valueOr.hpp>
+
 
 namespace vx {
-	enum class Result : std::int32_t {
-		eSuccess = 0,
-		eFailure = -1
+	/**
+	 * @brief An enum representing
+	 * */
+	enum class ErrorCode : std::uint32_t {
+		eFailure,
 	};
 
-	constexpr auto operator!(Result res) noexcept -> bool {
-		return std::to_underlying(res) >= std::underlying_type_t<Result> (0);
-	}
-
-
-	struct ErrorFrame {
+	struct [[nodiscard]] ErrorFrame {
 		std::optional<std::string> message;
+		std::optional<ErrorCode> errorCode;
 		std::source_location location;
 	};
 
@@ -56,13 +58,14 @@ namespace vx {
 			std::stack<ErrorFrame> *m_frames;
 	};
 
-	struct ErrorPayload {
+	struct [[nodiscard]] ErrorPayload {
 		std::stack<ErrorFrame> frames;
 		inline auto begin() noexcept {return ErrorPayloadIterator{frames};}
 		inline auto end() const noexcept {return ErrorPayloadIterator{};}
 	};
 
 	template <typename ...Args>
+	[[nodiscard]]
 	constexpr auto makeErrorStack(
 		std::source_location &&location,
 		std::format_string<Args...> format,
@@ -71,12 +74,45 @@ namespace vx {
 		ErrorPayload payload {};
 		payload.frames.push(ErrorFrame{
 			.message = std::format(format, std::forward<Args> (args)...),
+			.errorCode = std::nullopt,
 			.location = std::move(location)
 		});
 		return std::unexpected(std::move(payload));
 	}
 
 	template <typename ...Args>
+	[[nodiscard]]
+	constexpr auto makeErrorStack(
+		std::source_location &&location,
+		ErrorCode errorCode,
+		std::format_string<Args...> format,
+		Args &&...args
+	) noexcept {
+		ErrorPayload payload {};
+		payload.frames.push(ErrorFrame{
+			.message = std::format(format, std::forward<Args> (args)...),
+			.errorCode = errorCode,
+			.location = std::move(location)
+		});
+		return std::unexpected(std::move(payload));
+	}
+
+	[[nodiscard]]
+	constexpr auto makeErrorStack(
+		std::source_location &&location,
+		ErrorCode errorCode
+	) noexcept {
+		ErrorPayload payload {};
+		payload.frames.push(ErrorFrame{
+			.message = std::nullopt,
+			.errorCode = errorCode,
+			.location = std::move(location)
+		});
+		return std::unexpected(std::move(payload));
+	}
+
+	template <typename ...Args>
+	[[nodiscard]]
 	constexpr auto addErrorToStack(
 		std::source_location &&location,
 		ErrorPayload &payload,
@@ -85,14 +121,57 @@ namespace vx {
 	) noexcept {
 		payload.frames.push(ErrorFrame{
 			.message = std::format(format, std::forward<Args> (args)...),
+			.errorCode = std::nullopt,
+			.location = std::move(location)
+		});
+		return std::unexpected(std::move(payload));
+	}
+
+	template <typename ...Args>
+	[[nodiscard]]
+	constexpr auto addErrorToStack(
+		std::source_location &&location,
+		ErrorPayload &payload,
+		ErrorCode errorCode,
+		std::format_string<Args...> format,
+		Args &&...args
+	) noexcept {
+		payload.frames.push(ErrorFrame{
+			.message = std::format(format, std::forward<Args> (args)...),
+			.errorCode = errorCode,
+			.location = std::move(location)
+		});
+		return std::unexpected(std::move(payload));
+	}
+
+	[[nodiscard]]
+	constexpr auto addErrorToStack(
+		std::source_location &&location,
+		ErrorPayload &payload,
+		ErrorCode errorCode
+	) noexcept {
+		payload.frames.push(ErrorFrame{
+			.message = std::nullopt,
+			.errorCode = errorCode,
 			.location = std::move(location)
 		});
 		return std::unexpected(std::move(payload));
 	}
 
 
+	/**
+	 * @brief A wrapper that return either the return value of a function, or an `vx::ErrorPayload`
+	 * @tparam T The type of the return value of a function on success
+	 *
+	 * This wrapper is more or less an alias to std::expected, but with the `[[nodiscard]]` added.
+	 *
+	 * @sa vx::ErrorPayload
+	 * @sa std::expected
+	 * */
 	template <typename T>
-	using Failable = std::expected<T, ErrorPayload>;
+	struct [[nodiscard]] Failable : public std::expected<T, ErrorPayload> {
+		using std::expected<T, ErrorPayload>::expected;
+	};
 }
 
 
@@ -106,11 +185,16 @@ struct std::formatter<vx::ErrorFrame> {
 	auto format(const vx::ErrorFrame &frame, std::format_context &ctx) const noexcept
 		-> std::format_context::iterator
 	{
-		std::string text {std::format("in {} ({}:{})",
+		std::string text {frame.errorCode
+			| flex::pipes::to_string()
+			| flex::pipes::transform([](const auto &str){return str + " "s;})
+			| flex::pipes::value_or("")
+		};
+		text += std::format("in {} ({}:{})",
 			frame.location.function_name(),
 			frame.location.file_name(),
 			frame.location.line()
-		)};
+		);
 		if (frame.message)
 			text += " > " + *frame.message;
 		return std::ranges::copy(text, ctx.out()).out;

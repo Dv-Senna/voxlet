@@ -14,6 +14,9 @@ add_library(voxlet_header_engine INTERFACE)
 target_include_directories(voxlet_header_engine INTERFACE
 	${VOXLET_ENGINE_DIR}/include
 )
+target_link_libraries(voxlet_header_engine INTERFACE
+	flex::flex_header_only
+)
 
 target_compile_definitions(voxlet_header_engine INTERFACE
 	VOXLET_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}

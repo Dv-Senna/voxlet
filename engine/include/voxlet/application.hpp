@@ -3,7 +3,7 @@
 #include <memory>
 #include <span>
 
-#include "voxlet/result.hpp"
+#include "voxlet/error.hpp"
 #include "voxlet/units.hpp"
 
 
@@ -13,12 +13,11 @@ namespace vx {
 			constexpr Application() noexcept = default;
 			virtual constexpr ~Application() = default;
 
-			virtual auto onStartup() noexcept -> vx::Result = 0;
-			virtual auto onUpdate(vx::Milliseconds dt) noexcept -> vx::Result = 0;
-			virtual auto onRender() noexcept -> vx::Result = 0;
-			virtual auto onShutdown() noexcept -> vx::Result = 0;
+			virtual auto onStartup() noexcept -> vx::Failable<void> = 0;
+			virtual auto onUpdate(vx::Milliseconds dt) noexcept -> vx::Failable<void> = 0;
+			virtual auto onRender() noexcept -> vx::Failable<void> = 0;
+			virtual auto onShutdown() noexcept -> vx::Failable<void> = 0;
 	};
-
 
 	auto createApplication(std::span<char* const> args) noexcept
 		-> vx::Failable<std::unique_ptr<Application>>;

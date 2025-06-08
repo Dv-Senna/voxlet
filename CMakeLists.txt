@@ -33,6 +33,11 @@ set(VOXLET_DOC_DIR        ${PROJECT_SOURCE_DIR}/doc)
 set(VOXLET_DEPS_DIR       ${PROJECT_SOURCE_DIR}/deps)
 
 
+# import deps
+set(FLEX_BUILD_HEADER_ONLY true)
+add_subdirectory(${VOXLET_DEPS_DIR}/flex)
+
+
 # include the different part of voxlet
 add_subdirectory(${VOXLET_ENGINE_DIR})
 add_subdirectory(${VOXLET_DOC_DIR})

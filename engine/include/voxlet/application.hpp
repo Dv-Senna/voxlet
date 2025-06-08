@@ -2,24 +2,38 @@
 
 #include <memory>
 #include <span>
+#include <string_view>
 
 #include "voxlet/error.hpp"
 #include "voxlet/units.hpp"
+#include "voxlet/utils.hpp"
 
 
 namespace vx {
-	class Application {
-		public:
-			constexpr Application() noexcept = default;
-			virtual constexpr ~Application() = default;
+	class Instance;
 
-			virtual auto onStartup() noexcept -> vx::Failable<void> = 0;
-			virtual auto onUpdate(vx::Milliseconds dt) noexcept -> vx::Failable<void> = 0;
-			virtual auto onRender() noexcept -> vx::Failable<void> = 0;
-			virtual auto onShutdown() noexcept -> vx::Failable<void> = 0;
+	struct ApplicationInfos {
+		std::string_view name;
+		vx::Version version;
 	};
 
-	auto createApplication(std::span<char* const> args) noexcept
+	class Application {
+		public:
+			constexpr Application(ApplicationInfos &&infos) noexcept : m_infos {std::move(infos)} {}
+			virtual constexpr ~Application() = default;
+
+			virtual auto onStartup(Instance &instance) noexcept -> vx::Failable<void> = 0;
+			virtual auto onUpdate(Instance &instance, vx::Milliseconds dt) noexcept -> vx::Failable<void> = 0;
+			virtual auto onRender(Instance &instance) noexcept -> vx::Failable<void> = 0;
+			virtual auto onShutdown(Instance &instance) noexcept -> vx::Failable<void> = 0;
+
+			constexpr auto getInfos() const noexcept -> const ApplicationInfos& {return m_infos;}
+
+		private:
+			ApplicationInfos m_infos;
+	};
+
+	auto createApplication(std::span<const std::string_view> args) noexcept
 		-> vx::Failable<std::unique_ptr<Application>>;
 }
 

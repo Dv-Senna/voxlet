@@ -28,7 +28,7 @@ class SandboxApp final : public vx::Application {
 			return {};
 		}
 
-		auto onUpdate([[maybe_unused]] vx::Instance &instance, vx::Milliseconds) noexcept -> vx::Failable<void> override {
+		auto onBeforeUpdates([[maybe_unused]] vx::Instance &instance, vx::Milliseconds) noexcept -> vx::Failable<void> override {
 			return {};
 		}
 
@@ -44,7 +44,6 @@ class SandboxApp final : public vx::Application {
 auto vx::createApplication([[maybe_unused]] std::span<const std::string_view> args) noexcept
 	-> vx::Failable<std::unique_ptr<vx::Application>>
 { 
-	return vx::makeErrorStack("Can't create app : {}", args);
 	return std::make_unique<SandboxApp> ();
 }
 

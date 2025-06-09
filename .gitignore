@@ -1,6 +1,6 @@
 # usual build and doc folder
 build/*
-doc/*
+doc/generated/*
 
 # neovim clangd lsp
 .cache/*

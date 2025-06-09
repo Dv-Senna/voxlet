@@ -25,12 +25,13 @@ option(VOXLET_AS_SHARED "Use the shared version of Voxlet" On)
 
 
 # Setup some directory path
-set(VOXLET_ENGINE_DIR     ${PROJECT_SOURCE_DIR}/engine)
-set(VOXLET_SANDBOX_DIR    ${PROJECT_SOURCE_DIR}/sandbox)
-set(VOXLET_TESTS_DIR      ${PROJECT_SOURCE_DIR}/tests)
-set(VOXLET_BENCHMARKS_DIR ${PROJECT_SOURCE_DIR}/benchmarks)
-set(VOXLET_DOC_DIR        ${PROJECT_SOURCE_DIR}/doc)
-set(VOXLET_DEPS_DIR       ${PROJECT_SOURCE_DIR}/deps)
+set(VOXLET_ENGINE_DIR        ${PROJECT_SOURCE_DIR}/engine)
+set(VOXLET_SANDBOX_DIR       ${PROJECT_SOURCE_DIR}/sandbox)
+set(VOXLET_TESTS_DIR         ${PROJECT_SOURCE_DIR}/tests)
+set(VOXLET_BENCHMARKS_DIR    ${PROJECT_SOURCE_DIR}/benchmarks)
+set(VOXLET_DOC_DIR           ${PROJECT_SOURCE_DIR}/doc)
+set(VOXLET_DOC_GENERATED_DIR ${VOXLET_DOC_DIR}/generated)
+set(VOXLET_DEPS_DIR          ${PROJECT_SOURCE_DIR}/deps)
 
 
 # import deps

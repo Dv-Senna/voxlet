@@ -1,3 +1,4 @@
+#include "voxlet/error.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <expected>
@@ -7,6 +8,7 @@
 #include <voxlet/application.hpp>
 #include <voxlet/instance.hpp>
 #include <voxlet/utils.hpp>
+#include <voxlet/logger.hpp>
 
 
 class SandboxApp final : public vx::Application {
@@ -15,10 +17,10 @@ class SandboxApp final : public vx::Application {
 			.name = "SandboxApp",
 			.version = vx::voxletVersion
 		}} {
-			std::println("SandboxApp created");
+			vx::Logger::global().verbose("SandboxApp created");
 		}
 		~SandboxApp() override {
-			std::println("SandboxApp destroyed");
+			vx::Logger::global().verbose("SandboxApp destroyed");
 		}
 
 
@@ -42,6 +44,7 @@ class SandboxApp final : public vx::Application {
 auto vx::createApplication([[maybe_unused]] std::span<const std::string_view> args) noexcept
 	-> vx::Failable<std::unique_ptr<vx::Application>>
 { 
+	return vx::makeErrorStack("Can't create app : {}", args);
 	return std::make_unique<SandboxApp> ();
 }
 
@@ -52,7 +55,7 @@ auto main(int argc, char **argv) -> int {
 	};
 	vx::Failable appWithError {vx::createApplication(args)};
 	if (!appWithError)
-		return std::println(stderr, "ERROR : {}", appWithError.error()), EXIT_FAILURE;
+		return vx::Logger::global().fatal("Can't create app : {}", appWithError.error()), EXIT_FAILURE;
 	auto application {std::move(*appWithError)};
 
 	vx::Instance::CreateInfos instanceCreateInfos {
@@ -61,7 +64,7 @@ auto main(int argc, char **argv) -> int {
 	};
 	vx::Failable instanceWithError {vx::Instance::create(instanceCreateInfos)};
 	if (!instanceWithError)
-		return std::println(stderr, "ERROR : {}", instanceWithError.error()), EXIT_FAILURE;
+		return vx::Logger::global().fatal("Can't create instance : {}", instanceWithError.error()), EXIT_FAILURE;
 	auto instance {std::move(*instanceWithError)};
 
 	return EXIT_SUCCESS;

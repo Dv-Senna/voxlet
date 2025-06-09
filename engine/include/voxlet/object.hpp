@@ -24,10 +24,13 @@ namespace vx {
 	}
 
 	template <typename T>
-	concept object = requires(typename T::CreateInfos createInfos) {
+	concept object = (requires(typename T::CreateInfos createInfos) {
 		typename T::CreateInfos;
 		{T::create(createInfos)} -> __internals::object_create_return<T>;
-	}
+	} || requires(typename T::CreateInfos createInfos) {
+		typename T::CreateInfos;
+		{T::create(std::move(createInfos))} -> __internals::object_create_return<T>;
+	})
 		&& std::is_base_of_v<Object, T>
 		&& std::move_constructible<T>
 		&& std::is_aggregate_v<typename T::CreateInfos>;

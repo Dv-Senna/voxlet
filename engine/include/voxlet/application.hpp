@@ -101,6 +101,19 @@ namespace vx {
 				[[maybe_unused]] Instance &instance,
 				[[maybe_unused]] vx::Milliseconds dt
 			) noexcept -> vx::Failable<void> {return {};}
+
+			/**
+			 * @brief A method run during the rendering phase of the application, after Voxlet's
+			 *        renderer rendering phase
+			 * @param instance The instance of Voxlet
+			 * @return Whether the method succed or not, with error informations in the latter
+			 *
+			 * This method allow you to do post-processing stuff and to do old and dirty rendering
+			 * if Voxlet's doesn't have something you want.
+			 *
+			 * @sa vx::Instance
+			 * @sa vx::Failable
+			 * */
 			virtual auto onRender(Instance &instance) noexcept -> vx::Failable<void> = 0;
 
 			/**

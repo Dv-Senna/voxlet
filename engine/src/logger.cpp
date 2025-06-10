@@ -2,17 +2,17 @@
 
 
 namespace vx {
-	auto Logger::create(CreateInfos &&createInfos) noexcept -> Logger {
+	auto Logger::create(const CreateInfos &createInfos) noexcept -> Logger {
 		Logger logger {};
 		logger.setName(createInfos.name);
-		logger.setOutput(std::move(createInfos.output));
+		logger.setOutput(createInfos.output);
 		logger.setMinimalLevel(createInfos.minimalLevel);
 		return logger;
 	}
 
 
-	auto Logger::setOutput(Output &&output) noexcept -> void {
-		m_output = std::move(output);
+	auto Logger::setOutput(const Output &output) noexcept -> void {
+		m_output = output;
 		if (std::holds_alternative<std::FILE*> (m_output)) {
 			auto file {std::get<std::FILE*> (m_output)};
 			if (file == stdout || file == stderr)

@@ -63,8 +63,17 @@ namespace vx {
 	 * @sa vx::ErrorPayload
 	 * */
 	struct [[nodiscard]] ErrorFrame {
+		/**
+		 * @brief An optional human-readable message for better error understanding
+		 * */
 		std::optional<std::string> message;
+		/**
+		 * @brief An optional error code for better handling of the error
+		 * */
 		std::optional<ErrorCode> errorCode;
+		/**
+		 * @brief The location of the error
+		 * */
 		std::source_location location;
 	};
 

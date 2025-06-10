@@ -4,6 +4,7 @@
 #include <string_view>
 
 #include "voxlet/application.hpp"
+#include "voxlet/core.hpp"
 #include "voxlet/error.hpp"
 #include "voxlet/object.hpp"
 
@@ -11,7 +12,7 @@
 namespace vx {
 	class Instance final : vx::Object {
 		public:
-			~Instance();
+			VOXLET_CORE ~Instance();
 			constexpr Instance(Instance&&) noexcept = default;
 
 			struct CreateInfos {
@@ -19,7 +20,7 @@ namespace vx {
 				const std::span<const std::string_view> args;
 			};
 
-			static auto create(const CreateInfos &createInfos) noexcept -> vx::Failable<Instance>;
+			VOXLET_CORE static auto create(const CreateInfos &createInfos) noexcept -> vx::Failable<Instance>;
 
 		private:
 			constexpr Instance() noexcept = default;

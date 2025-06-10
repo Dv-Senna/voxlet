@@ -8,6 +8,7 @@
 #include <flex/pipes/valueOr.hpp>
 #include <flex/reference.hpp>
 
+#include "voxlet/core.hpp"
 #include "voxlet/object.hpp"
 
 
@@ -42,10 +43,10 @@ namespace vx {
 				vx::LogLevel minimalLevel {vx::LogLevel::eInfo};
 			};
 
-			static auto create(CreateInfos &&createInfos) noexcept -> Logger;
+			VOXLET_CORE static auto create(CreateInfos &&createInfos) noexcept -> Logger;
 			inline static auto global() noexcept -> Logger& {return s_global;}
 
-			auto setOutput(Output &&output) noexcept -> void;
+			VOXLET_CORE auto setOutput(Output &&output) noexcept -> void;
 			inline auto setName(std::string_view name) noexcept -> void {m_name = name;}
 			inline auto setMinimalLevel(vx::LogLevel minimalLevel) noexcept -> void {m_minimalLevel = minimalLevel;}
 
@@ -89,7 +90,7 @@ namespace vx {
 			vx::LogLevel m_minimalLevel;
 			bool m_colored;
 
-			static Logger s_global;
+			VOXLET_CORE static Logger s_global;
 	};
 
 	static_assert(vx::object<Logger>);

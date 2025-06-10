@@ -18,12 +18,50 @@
 
 namespace vx {
 	/**
-	 * @brief An enum representing
+	 * @defgroup error Error / error handling
+	 * @brief Every error or error handling related stuff
+	 *
+	 * Here we define a few term related to how errors work in Voxlet :
+	 *     - We call *error-frame* the object that contains the data about a
+	 *       specific error at a specific point in space or time. This usually
+	 *       contains a message, some `vx::ErrorCode` and the function where
+	 *       the error appeared
+	 *     - We call *error-stack* the stack-like collection of all *error-frame*,
+	 *       such that the top of the stack is the latest / most broad error in
+	 *       the callstack, and the bottom is the original / most specific error
+	 *     - We call *error-payload* the object that is transmited between
+	 *       functions on the callstack. In our case, this can be understood as
+	 *       the *error-stack*
+	 *     - We call *failable* the object that allow the seemless transmition
+	 *       of either the success return value, or the *error-payload* in case
+	 *       of a failure
+	 *
+	 * As a general rule, try to handle the error as soon as possible. But if
+	 * you can't do anything from where you are, push your error on the
+	 * *erro-stack* carried by the *error-payload* and propagate-it to the next
+	 * function.
+	 * */
+
+	/**
+	 * @brief Different error code that a function can return to be more specific
+	 *        about the cause of failure
+	 * @ingroup error
+	 * @sa vx::ErrorFrame
 	 * */
 	enum class ErrorCode : std::uint32_t {
+		/**
+		 * @brief Indicate a general failure. Use only if nothing better is
+		 *        available, as it will most likely result in a fatal error
+		 * */
 		eFailure,
 	};
 
+	/**
+	 * @brief A struct representing an *error-frame*
+	 * @ingroup error
+	 * @sa vx::ErrorCode
+	 * @sa vx::ErrorPayload
+	 * */
 	struct [[nodiscard]] ErrorFrame {
 		std::optional<std::string> message;
 		std::optional<ErrorCode> errorCode;
@@ -31,18 +69,45 @@ namespace vx {
 	};
 
 
+	/**
+	 * @brief Some iterator class to allow for iteration on the
+	 *        `vx::ErrorPayload`'s *error-stack*
+	 * @ingroup error
+	 * @sa vx::ErrorPayload
+	 * */
 	class ErrorPayloadIterator {
 		friend struct ErrorPayload;
 		public:
+			/**
+			 * @brief Default construct / end tag
+			 * */
 			constexpr ErrorPayloadIterator() noexcept : m_frames {nullptr} {};
+			/**
+			 * @brief Dereference operator
+			 * @return A reference to the top-most `vx::ErrorFrame`
+			 * */
 			inline auto operator*() const noexcept -> auto& {return m_frames->top();}
+			/**
+			 * @brief Dereference operator
+			 * @return A pointer to the top-most `vx::ErrorFrame`
+			 * */
 			inline auto operator->() const noexcept {return &m_frames->top();}
-			inline auto operator++() const noexcept {
+			/**
+			 * @brief Pop the top-most `vx::ErrorFrame` out of the `vx::ErrorPayload`
+			 * @warning This has a permanent forgetting effect on the *error-payload*
+			 * @return A reference to the iterator
+			 * */
+			inline auto operator++() noexcept -> ErrorPayloadIterator& {
 				if (m_frames != nullptr)
 					m_frames->pop();
 				return *this;
 			}
 
+			/**
+			 * @brief Check iterator equality
+			 * @param it An iterator to check to `this`
+			 * @return Whether the two iterators are equivalent or not
+			 * */
 			inline auto operator==(const ErrorPayloadIterator &it) const noexcept -> bool {
 				if (m_frames == nullptr && it.m_frames == nullptr)
 					return true;
@@ -58,12 +123,46 @@ namespace vx {
 			std::stack<ErrorFrame> *m_frames;
 	};
 
+	/**
+	 * @brief A struct representing an *error-payload*
+	 * @note You don't usually interact with this struct directly, but through
+	 *       `vx::makeErrorStack()` and `vx::addErrorToStack()`
+	 * @ingroup error
+	 * @sa vx::ErrorFrame
+	 * @sa vx::makeErrorStack()
+	 * @sa vx::addErrorToStack()
+	 * @sa vx::ErrorPayloadIterator
+	 * */
 	struct [[nodiscard]] ErrorPayload {
+		/**
+		 * @brief The actual *error-stack*
+		 * */
 		std::stack<ErrorFrame> frames;
+		/**
+		 * @brief Begin iterator of payload. Is always equivalent to all
+		 *        non-ending iterator on an instance of the *error-payload*
+		 * @return An iterator
+		 * */
 		inline auto begin() noexcept {return ErrorPayloadIterator{frames};}
+		/**
+		 * @brief End iterator of payload
+		 * @return An ending iterator
+		 * */
 		inline auto end() const noexcept {return ErrorPayloadIterator{};}
 	};
 
+	/**
+	 * @brief Create an *error-stack* with a single *error-frame*, and wrap-it
+	 *        in an *error-payload*
+	 * @param location The location where the error happened. Provided by macros
+	 * @param format The format string of a message
+	 * @param args The argument of the format string
+	 * @return An *error-payload* containing the created *error-stack*
+	 * @ingroup error
+	 * @sa vx::ErrorPayload
+	 * @sa vx::ErrorFrame
+	 * @sa vx::addErrorToStack()
+	 * */
 	template <typename ...Args>
 	[[nodiscard]]
 	constexpr auto makeErrorStack(
@@ -80,6 +179,14 @@ namespace vx {
 		return std::unexpected(std::move(payload));
 	}
 
+	/**
+	 * @overload
+	 * @param location The location where the error happened. Provided by macros
+	 * @param errorCode The code of the error
+	 * @param format The format string of a message
+	 * @param args The argument of the format string
+	 * @ingroup error
+	 * */
 	template <typename ...Args>
 	[[nodiscard]]
 	constexpr auto makeErrorStack(
@@ -97,6 +204,12 @@ namespace vx {
 		return std::unexpected(std::move(payload));
 	}
 
+	/**
+	 * @overload
+	 * @param location The location where the error happened. Provided by macros
+	 * @param errorCode The code of the error
+	 * @ingroup error
+	 * */
 	[[nodiscard]]
 	constexpr auto makeErrorStack(
 		std::source_location &&location,
@@ -111,6 +224,18 @@ namespace vx {
 		return std::unexpected(std::move(payload));
 	}
 
+	/**
+	 * @brief Add an *error-frame* to an *error-stack* and wrap-it in an *error-payload*
+	 * @param location The location where the error happened. Provided by macros
+	 * @param payload The *error-payload* containing the *error-stack* to add to
+	 * @param format The format string of a message
+	 * @param args The argument of the format string
+	 * @return An rvalue reference to the *error-payload*
+	 * @ingroup error
+	 * @sa vx::ErrorPayload
+	 * @sa vx::ErrorFrame
+	 * @sa vx::makeErrorStack()
+	 * */
 	template <typename ...Args>
 	[[nodiscard]]
 	constexpr auto addErrorToStack(
@@ -127,6 +252,15 @@ namespace vx {
 		return std::unexpected(std::move(payload));
 	}
 
+	/**
+	 * @overload
+	 * @param location The location where the error happened. Provided by macros
+	 * @param payload The *error-payload* containing the *error-stack* to add to
+	 * @param errorCode The code of the error
+	 * @param format The format string of a message
+	 * @param args The argument of the format string
+	 * @ingroup error
+	 * */
 	template <typename ...Args>
 	[[nodiscard]]
 	constexpr auto addErrorToStack(
@@ -144,6 +278,13 @@ namespace vx {
 		return std::unexpected(std::move(payload));
 	}
 
+	/**
+	 * @overload
+	 * @param location The location where the error happened. Provided by macros
+	 * @param payload The *error-payload* containing the *error-stack* to add to
+	 * @param errorCode The code of the error
+	 * @ingroup error
+	 * */
 	[[nodiscard]]
 	constexpr auto addErrorToStack(
 		std::source_location &&location,
@@ -165,8 +306,10 @@ namespace vx {
 	 *
 	 * This wrapper is more or less an alias to std::expected, but with the `[[nodiscard]]` added.
 	 *
+	 * @ingroup error
 	 * @sa vx::ErrorPayload
-	 * @sa std::expected
+	 * @sa vx::makeErrorStack()
+	 * @sa vx::addErrorToStack()
 	 * */
 	template <typename T>
 	struct [[nodiscard]] Failable : public std::expected<T, ErrorPayload> {

@@ -1,4 +1,5 @@
 #pragma once
+/** @file */
 
 
 #ifdef VOXLET_SHARED_ENGINE
@@ -12,5 +13,9 @@
 		#define VOXLET_CORE
 	#endif
 #else
+	/**
+	 * @brief A macro containing necessary attribute for proper function
+	 *        calling depending in the platform
+	 * */
 	#define VOXLET_CORE
 #endif

@@ -1,3 +1,6 @@
 [submodule "deps/flex"]
 	path = deps/flex
 	url = git@github.com:Dv-Senna/flex.git
+[submodule "deps/turbolin"]
+	path = deps/turbolin
+	url = git@github.com:Dv-Senna/turbolin.git

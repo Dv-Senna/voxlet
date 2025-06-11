@@ -1,9 +1,12 @@
 #include "voxlet/error.hpp"
+#include <SDL3/SDL_video.h>
 #include <cstdlib>
 #include <cstring>
 #include <expected>
 #include <format>
 #include <ranges>
+
+#include <SDL3/SDL.h>
 
 #include <voxlet/application.hpp>
 #include <voxlet/instance.hpp>
@@ -65,6 +68,20 @@ auto main(int argc, char **argv) -> int {
 	if (!instanceWithError)
 		return vx::Logger::global().fatal("Can't create instance : {}", instanceWithError.error()), EXIT_FAILURE;
 	auto instance {std::move(*instanceWithError)};
+
+	bool running {true};
+	while (running) {
+		SDL_Event event {};
+		while (SDL_PollEvent(&event)) {
+			if (event.type == SDL_EVENT_QUIT)
+				running = false;
+			else if (event.type == SDL_EVENT_KEY_DOWN && event.key.scancode == SDL_SCANCODE_ESCAPE)
+				running = false;
+		}
+
+		if (!SDL_GL_SwapWindow(instance.getWindow().getWindow()))
+			return vx::Logger::global().fatal("Can't swap window : {}", SDL_GetError()), EXIT_FAILURE;
+	}
 
 	return EXIT_SUCCESS;
 }

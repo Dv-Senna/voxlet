@@ -160,6 +160,24 @@ namespace vx {
 		inline auto end() const noexcept {return ErrorPayloadIterator{};}
 	};
 
+
+	/**
+	 * @brief A wrapper that return either the return value of a function, or an `vx::ErrorPayload`
+	 * @tparam T The type of the return value of a function on success
+	 *
+	 * This wrapper is more or less an alias to std::expected, but with the `[[nodiscard]]` added.
+	 *
+	 * @ingroup error
+	 * @sa vx::ErrorPayload
+	 * @sa vx::makeErrorStack()
+	 * @sa vx::addErrorToStack()
+	 * */
+	template <typename T>
+	struct [[nodiscard]] Failable : public std::expected<T, ErrorPayload> {
+		using std::expected<T, ErrorPayload>::expected;
+	};
+
+
 	/**
 	 * @brief Create an *error-stack* with a single *error-frame*, and wrap-it
 	 *        in an *error-payload*
@@ -245,20 +263,20 @@ namespace vx {
 	 * @sa vx::ErrorFrame
 	 * @sa vx::makeErrorStack()
 	 * */
-	template <typename ...Args>
+	template <typename T, typename ...Args>
 	[[nodiscard]]
 	constexpr auto addErrorToStack(
 		std::source_location &&location,
-		ErrorPayload &payload,
+		vx::Failable<T> &payload,
 		std::format_string<Args...> format,
 		Args &&...args
 	) noexcept {
-		payload.frames.push(ErrorFrame{
+		payload.error().frames.push(ErrorFrame{
 			.message = std::format(format, std::forward<Args> (args)...),
 			.errorCode = std::nullopt,
 			.location = std::move(location)
 		});
-		return std::unexpected(std::move(payload));
+		return std::unexpected(std::move(payload.error()));
 	}
 
 	/**
@@ -270,21 +288,21 @@ namespace vx {
 	 * @param args The argument of the format string
 	 * @ingroup error
 	 * */
-	template <typename ...Args>
+	template <typename T, typename ...Args>
 	[[nodiscard]]
 	constexpr auto addErrorToStack(
 		std::source_location &&location,
-		ErrorPayload &payload,
+		vx::Failable<T> &payload,
 		ErrorCode errorCode,
 		std::format_string<Args...> format,
 		Args &&...args
 	) noexcept {
-		payload.frames.push(ErrorFrame{
+		payload.error().frames.push(ErrorFrame{
 			.message = std::format(format, std::forward<Args> (args)...),
 			.errorCode = errorCode,
 			.location = std::move(location)
 		});
-		return std::unexpected(std::move(payload));
+		return std::unexpected(std::move(payload.error()));
 	}
 
 	/**
@@ -294,36 +312,20 @@ namespace vx {
 	 * @param errorCode The code of the error
 	 * @ingroup error
 	 * */
+	template <typename T>
 	[[nodiscard]]
 	constexpr auto addErrorToStack(
 		std::source_location &&location,
-		ErrorPayload &payload,
+		vx::Failable<T> &payload,
 		ErrorCode errorCode
 	) noexcept {
-		payload.frames.push(ErrorFrame{
+		payload.error().frames.push(ErrorFrame{
 			.message = std::nullopt,
 			.errorCode = errorCode,
 			.location = std::move(location)
 		});
-		return std::unexpected(std::move(payload));
+		return std::unexpected(std::move(payload.error()));
 	}
-
-
-	/**
-	 * @brief A wrapper that return either the return value of a function, or an `vx::ErrorPayload`
-	 * @tparam T The type of the return value of a function on success
-	 *
-	 * This wrapper is more or less an alias to std::expected, but with the `[[nodiscard]]` added.
-	 *
-	 * @ingroup error
-	 * @sa vx::ErrorPayload
-	 * @sa vx::makeErrorStack()
-	 * @sa vx::addErrorToStack()
-	 * */
-	template <typename T>
-	struct [[nodiscard]] Failable : public std::expected<T, ErrorPayload> {
-		using std::expected<T, ErrorPayload>::expected;
-	};
 }
 
 

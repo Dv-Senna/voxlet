@@ -8,6 +8,9 @@
 #include "voxlet/error.hpp"
 #include "voxlet/object.hpp"
 
+#include "voxlet/graphics/context.hpp"
+#include "voxlet/graphics/window.hpp"
+
 
 namespace vx {
 	/**
@@ -50,10 +53,15 @@ namespace vx {
 			 * */
 			VOXLET_CORE static auto create(const CreateInfos &createInfos) noexcept -> vx::Failable<Instance>;
 
+			inline auto getGraphicsContext() noexcept -> vx::graphics::Context& {return m_graphicsContext;}
+			inline auto getWindow() noexcept -> vx::graphics::Window& {return m_window;}
+
 		private:
 			constexpr Instance() noexcept = default;
 
 			vx::BuiltFlag m_built;
+			vx::graphics::Context m_graphicsContext;
+			vx::graphics::Window m_window;
 	};
 
 	static_assert(vx::object<Instance>);

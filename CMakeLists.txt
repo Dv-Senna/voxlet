@@ -32,11 +32,18 @@ set(VOXLET_BENCHMARKS_DIR    ${PROJECT_SOURCE_DIR}/benchmarks)
 set(VOXLET_DOC_DIR           ${PROJECT_SOURCE_DIR}/doc)
 set(VOXLET_DOC_GENERATED_DIR ${VOXLET_DOC_DIR}/generated)
 set(VOXLET_DEPS_DIR          ${PROJECT_SOURCE_DIR}/deps)
+set(VOXLET_CMAKE_DIR         ${PROJECT_SOURCE_DIR}/cmake)
 
 
-# import deps
+# import flex
 set(FLEX_BUILD_HEADER_ONLY true)
 add_subdirectory(${VOXLET_DEPS_DIR}/flex)
+
+# import turbolin
+include(${VOXLET_CMAKE_DIR}/turbolin.cmake)
+
+# import SDL3
+find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3-shared)
 
 
 # include the different part of voxlet

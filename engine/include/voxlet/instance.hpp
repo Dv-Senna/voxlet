@@ -14,7 +14,11 @@ namespace vx {
 	 * @brief Object that manage the whole life of the engine. Also the main
 	 *        interaction point with Voxlet for the application
 	 * */
-	class Instance final : vx::Object {
+	class Instance final {
+		Instance(const Instance&) = delete;
+		auto operator=(const Instance&) -> Instance& = delete;
+		auto operator=(Instance&&) -> Instance& = delete;
+
 		public:
 			VOXLET_CORE ~Instance();
 			/**

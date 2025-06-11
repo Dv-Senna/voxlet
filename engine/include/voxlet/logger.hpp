@@ -59,8 +59,12 @@ namespace vx {
 	 *          thread-safe and you don't use the logger's setters
 	 * @sa vx::Logger::log()
 	 * */
-	class Logger final : vx::Object {
+	class Logger final {
 		using Output = std::variant<flex::Reference<std::ostream>, std::FILE*>;
+		Logger(const Logger&) = delete;
+		auto operator=(const Logger&) -> Logger& = delete;
+		auto operator=(Logger&&) -> Logger& = delete;
+
 		public:
 			constexpr Logger() noexcept :
 				m_name {"<no-name>"},

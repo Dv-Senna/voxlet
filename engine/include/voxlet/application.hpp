@@ -133,6 +133,10 @@ namespace vx {
 			 * */
 			virtual auto onShutdown(Instance &instance) noexcept -> vx::Failable<void> = 0;
 
+			/**
+			 * @brief Getter
+			 * @return The infos of the application
+			 * */
 			constexpr auto getInfos() const noexcept -> const ApplicationInfos& {return m_infos;}
 
 		private:

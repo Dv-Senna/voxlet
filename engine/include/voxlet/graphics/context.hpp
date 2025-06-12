@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL3/SDL.h>
+
 #include "voxlet/application.hpp"
 #include "voxlet/core.hpp"
 #include "voxlet/error.hpp"
@@ -7,6 +9,8 @@
 
 
 namespace vx::graphics {
+	class Window;
+
 	class Context {
 		Context(const Context&) = delete;
 		auto operator=(const Context&) -> Context& = delete;
@@ -22,8 +26,12 @@ namespace vx::graphics {
 			};
 
 			VOXLET_CORE static auto create(const CreateInfos &createInfos) noexcept -> vx::Failable<Context>;
+			VOXLET_CORE auto makeWindowCurrent(vx::graphics::Window &window) noexcept -> vx::Failable<void>;
+
+			inline auto getContext() const noexcept -> SDL_GLContext {return m_context;};
 
 		private:
 			vx::BuiltFlag m_built;
+			SDL_GLContext m_context;
 	};
 }

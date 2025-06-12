@@ -14,7 +14,10 @@ namespace vx {
 
 	auto Instance::create(const CreateInfos &createInfos) noexcept -> vx::Failable<Instance> {
 		vx::Logger::global().info("Voxlet instance created. version={}", vx::voxletVersion);
-		vx::Logger::global().info("Application : '{}', version={}", createInfos.appInfos.name, createInfos.appInfos.version);
+		vx::Logger::global().info("Application : '{}', version={}",
+			createInfos.appInfos.name,
+			createInfos.appInfos.version
+		);
 		Instance instance {};
 		instance.m_built = true;
 
@@ -34,6 +37,10 @@ namespace vx {
 		if (!windowWithError)
 			return vx::addErrorToStack(windowWithError, "Can't create window");
 		instance.m_window = std::move(*windowWithError);
+
+		if (auto err {instance.m_graphicsContext.makeWindowCurrent(instance.m_window)}; !err)
+			return vx::addErrorToStack(err, "Can't make window current to graphics context");
+
 		return instance;
 	}
 

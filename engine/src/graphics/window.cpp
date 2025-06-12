@@ -7,8 +7,6 @@ namespace vx::graphics {
 	Window::~Window() {
 		if (!m_built)
 			return;
-		if (m_context != nullptr)
-			SDL_GL_DestroyContext(m_context);
 		if (m_window != nullptr)
 			SDL_DestroyWindow(m_window);
 		vx::Logger::global().verbose("Voxlet window '{}' destroyed", m_title);
@@ -27,10 +25,6 @@ namespace vx::graphics {
 		);
 		if (window.m_window == nullptr)
 			return vx::makeErrorStack("Can't create an SDL3 window : {}", SDL_GetError());
-
-		window.m_context = SDL_GL_CreateContext(window.m_window);
-		if (window.m_context == nullptr)
-			return vx::makeErrorStack("Can't create an SDL3 OpenGL context : {}", SDL_GetError());
 
 		vx::Logger::global().verbose("Voxlet window '{}' of initial size {} created",
 			window.m_title,

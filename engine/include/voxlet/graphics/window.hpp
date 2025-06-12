@@ -35,6 +35,5 @@ namespace vx::graphics {
 			vx::BuiltFlag m_built;
 			std::string m_title;
 			SDL_Window *m_window;
-			SDL_GLContext m_context;
 	};
 }

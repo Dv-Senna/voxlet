@@ -14,6 +14,9 @@ doc/generated/*
 !scripts/*.bat
 !scripts/*.ps1
 
+# cmake stuffs
+__cmake_systeminformation/*
+
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudio,visualstudiocode,vim,clion
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudio,visualstudiocode,vim,clion

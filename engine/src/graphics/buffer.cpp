@@ -1,4 +1,6 @@
 #include "voxlet/graphics/buffer.hpp"
+
+#include "voxlet/enumDispatcher.hpp"
 #include "voxlet/logger.hpp"
 
 
@@ -13,6 +15,14 @@ namespace vx::graphics {
 	auto Buffer::create(const CreateInfos &createInfos) noexcept
 		-> vx::Failable<Buffer>
 	{
+		constexpr vx::EnumDispatcher bufferTypeDispatcher {
+			std::pair{BufferType::eVertex,             GL_ARRAY_BUFFER},
+			std::pair{BufferType::eIndex,              GL_ELEMENT_ARRAY_BUFFER},
+			std::pair{BufferType::eShaderStorage,      GL_SHADER_STORAGE_BUFFER},
+			std::pair{BufferType::eUniform,            GL_UNIFORM_BUFFER},
+			std::pair{BufferType::eTransformFeedback,  GL_TRANSFORM_FEEDBACK_BUFFER},
+		};
+
 		const std::byte *data {nullptr};
 		if (createInfos.content) {
 			if (createInfos.content->size_bytes() < static_cast<std::size_t> (createInfos.size)) {

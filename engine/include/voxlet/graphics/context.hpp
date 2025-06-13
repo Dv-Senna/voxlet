@@ -34,4 +34,6 @@ namespace vx::graphics {
 			vx::BuiltFlag m_built;
 			SDL_GLContext m_context;
 	};
+
+	static_assert(vx::object<Context>);
 }

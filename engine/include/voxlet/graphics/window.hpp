@@ -36,4 +36,6 @@ namespace vx::graphics {
 			std::string m_title;
 			SDL_Window *m_window;
 	};
+
+	static_assert(vx::object<Window>);
 }

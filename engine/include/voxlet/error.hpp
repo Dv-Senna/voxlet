@@ -54,6 +54,10 @@ namespace vx {
 		 *        available, as it will most likely result in a fatal error
 		 * */
 		eFailure,
+		/**
+		 * @brief Indicate that the provided data is too small for its usage
+		 * */
+		eDataTooSmall,
 	};
 
 	/**

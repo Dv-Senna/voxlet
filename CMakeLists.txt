@@ -45,6 +45,9 @@ include(${VOXLET_CMAKE_DIR}/turbolin.cmake)
 # import SDL3
 find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3-shared)
 
+# import glad
+add_subdirectory(${VOXLET_DEPS_DIR}/glad)
+
 
 # include the different part of voxlet
 add_subdirectory(${VOXLET_ENGINE_DIR})

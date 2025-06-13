@@ -18,6 +18,7 @@ target_link_libraries(voxlet_header_engine INTERFACE
 	flex::flex_header_only
 	SDL3::SDL3
 	turbolin::turbolin
+	glad::glad
 )
 
 target_compile_definitions(voxlet_header_engine INTERFACE

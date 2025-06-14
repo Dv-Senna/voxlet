@@ -58,6 +58,11 @@ namespace vx {
 		 * @brief Indicate that the provided data is too small for its usage
 		 * */
 		eDataTooSmall,
+		/**
+		 * @brief Indicate that the specifier of the object you want to view into
+		 *        is not the same as the one of the view
+		 * */
+		eInvalidObjectViewSpec
 	};
 
 	/**

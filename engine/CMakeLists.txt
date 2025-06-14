@@ -18,13 +18,14 @@ target_link_libraries(voxlet_header_engine INTERFACE
 	flex::flex_header_only
 	SDL3::SDL3
 	turbolin::turbolin
-	glad::glad
+	${VOXLET_RENDERER_LIBRARIES}
 )
 
 target_compile_definitions(voxlet_header_engine INTERFACE
 	VOXLET_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
 	VOXLET_VERSION_MINOR=${PROJECT_VERSION_MINOR}
 	VOXLET_VERSION_PATCH=${PROJECT_VERSION_PATCH}
+	${VOXLET_RENDERER_DEFINES}
 )
 
 if (PROJECT_IS_TOP_LEVEL AND ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
@@ -37,6 +38,7 @@ endif()
 
 # source files of the engine
 file(GLOB_RECURSE VOXLET_SOURCE_FILES ${VOXLET_ENGINE_DIR}/src/*.cpp)
+list(REMOVE_ITEM VOXLET_SOURCE_FILES ${VOXLET_RENDERER_TO_REMOVE_SOURCE_FILES})
 
 
 #####################

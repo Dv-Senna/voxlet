@@ -5,7 +5,6 @@
 #include <concepts>
 #include <functional>
 #include <optional>
-#include <ranges>
 #include <utility>
 
 #include <flex/reflection/enums.hpp>
@@ -15,7 +14,7 @@
 
 
 namespace vx {
-	template <flex::enumeration Key, typename Value, std::size_t N>
+	template <typename Key, typename Value, std::size_t N>
 	class EnumDispatcher final {
 		using This = EnumDispatcher<Key, Value, N>;
 		EnumDispatcher() = delete;
@@ -29,19 +28,15 @@ namespace vx {
 			requires (
 				(std::same_as<typename Args::first_type, Key>
 				&& std::convertible_to<typename Args::second_type, Value>) && ...
-				
 			) && (sizeof...(Args) == N)
 			consteval EnumDispatcher(Args ...args) noexcept {
 				m_values = std::array{std::pair{args.first, static_cast<Value> (args.second)}...};
 				std::ranges::sort(m_values, {}, &std::pair<Key, Value>::first);
-
-				auto keyDuplicates {m_values
-					| std::views::slide(2)
-					| std::views::transform([](auto &&range) {
-						return std::ranges::is_sorted(range, std::ranges::less_equal{});
-					})
-				};
-				if (!std::ranges::fold_left(keyDuplicates, true, std::logical_and<bool> {}))
+				if (!std::ranges::is_sorted(
+					m_values,
+					std::ranges::less_equal{},
+					&std::pair<Key, Value>::first
+				))
 					vx::constevalError("Can't have duplicated keys in vx::EnumDispatcher");
 			}
 

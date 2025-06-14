@@ -1,10 +1,12 @@
-#include "voxlet/graphics/buffer.hpp"
+#include "voxlet/graphics/opengl/buffer.hpp"
 
 #include "voxlet/enumDispatcher.hpp"
+#include "voxlet/error.hpp"
+#include "voxlet/graphics/opengl/function.hpp"
 #include "voxlet/logger.hpp"
 
 
-namespace vx::graphics {
+namespace vx::graphics::opengl {
 	Buffer::~Buffer() {
 		if (m_buffer == 0)
 			return;
@@ -15,7 +17,7 @@ namespace vx::graphics {
 	auto Buffer::create(const CreateInfos &createInfos) noexcept
 		-> vx::Failable<Buffer>
 	{
-		constexpr vx::EnumDispatcher bufferTypeDispatcher {
+		[[maybe_unused]] constexpr vx::EnumDispatcher bufferTypeDispatcher {
 			std::pair{BufferType::eVertex,             GL_ARRAY_BUFFER},
 			std::pair{BufferType::eIndex,              GL_ELEMENT_ARRAY_BUFFER},
 			std::pair{BufferType::eShaderStorage,      GL_SHADER_STORAGE_BUFFER},
@@ -46,13 +48,14 @@ namespace vx::graphics {
 
 		Buffer buffer {};
 		glCreateBuffers(1, &buffer.m_buffer);
-		glNamedBufferStorage(
+		auto bufferStorageError {vx::graphics::opengl::call(glNamedBufferStorage,
 			buffer.m_buffer,
 			static_cast<std::size_t> (createInfos.size),
 			data,
 			0
-		);
-
+		)};
+		if (!bufferStorageError)
+			return vx::addErrorToStack(bufferStorageError, "Can't create buffer storage");
 		return buffer;
 	}
 }

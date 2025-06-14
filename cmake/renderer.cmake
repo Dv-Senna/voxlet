@@ -1,0 +1,71 @@
+cmake_minimum_required(VERSION 3.25)
+
+foreach(renderer IN LISTS VOXLET_RENDERER_LIST)
+	set(VOXLET_RENDERER_ENABLE_${renderer} Off)
+endforeach()
+
+if (${VOXLET_FORCE_RENDERER} STREQUAL "None")
+	foreach(renderer IN LISTS VOXLET_RENDERER_LIST)
+		string(TOUPPER ${renderer} rendererUppercase)
+		set(VOXLET_RENDERER_ENABLE_${renderer} NOT ${VOXLET_DISABLE_${rendererUppercase}_RENDERER})
+	endforeach()
+else()
+	set(VOXLET_UNKNOWN_RENDERER On)
+	foreach(renderer IN LISTS VOXLET_RENDERER_LIST)
+		if (${VOXLET_FORCE_RENDERER} STREQUAL ${renderer})
+			set(VOXLET_UNKNOWN_RENDERER Off)
+			set(VOXLET_RENDERER_ENABLE_${renderer} On)
+			break()
+		endif()
+	endforeach()
+	if (NOT VOXLET_UNKNOWN_RENDERER)
+		message(FATAL_ERROR "Unknown renderer '${VOXLET_FORCE_RENDERER}' to force")
+	endif()
+endif()
+
+
+if (NOT WIN32)
+	set(VOXLET_RENDERER_ENABLE_D3D11 Off)
+	set(VOXLET_RENDERER_ENABLE_D3D12 Off)
+endif()
+
+if (NOT APPLE)
+	set(VOXLET_RENDERER_ENABLE_Metal Off)
+endif()
+
+
+set(VOXLET_HAS_ONE_ENABLED_RENDERER Off)
+foreach(renderer IN LISTS VOXLET_RENDERER_LIST)
+	if (${VOXLET_RENDERER_ENABLE_${renderer}})
+		set(VOXLET_HAS_ONE_ENABLED_RENDERER On)
+		break()
+	endif()
+endforeach()
+
+if (NOT VOXLET_HAS_ONE_ENABLED_RENDERER)
+	message(FATAL_ERROR "No renderer is enabled. This may be due to forcing an unsupported renderer for example")
+endif()
+
+message("The following renderers are enabled :")
+set(VOXLET_RENDERER_DEFINES "")
+foreach(renderer IN LISTS VOXLET_RENDERER_LIST)
+	if (${VOXLET_RENDERER_ENABLE_${renderer}})
+		string(TOUPPER ${renderer} rendererUppercase)
+		list(APPEND VOXLET_RENDERER_DEFINES VOXLET_RENDERER_${rendererUppercase})
+		message("\t- ${renderer}")
+	endif()
+endforeach()
+
+set(VOXLET_RENDERER_LIBRARIES "")
+
+set(VOXLET_RENDERER_TO_REMOVE_SOURCE_FILES "")
+foreach (renderer IN LISTS VOXLET_RENDERER_LIST)
+	if (${VOXLET_RENDERER_ENABLE_${renderer}})
+		continue()
+	endif()
+	string(TOLOWER ${renderer} rendererLowercase)
+	file(GLOB_RECURSE EXCLUDE_FILES ${VOXLET_ENGINE_DIR}/src/graphics/${rendererLowercase}/*.cpp)
+	list(APPEND VOXLET_RENDERER_TO_REMOVE_SOURCE_FILES ${EXCLUDE_FILES})
+endforeach()
+
+

@@ -23,6 +23,16 @@ endif()
 
 option(VOXLET_AS_SHARED "Use the shared version of Voxlet" On)
 
+set(VOXLET_RENDERER_LIST "OpenGL" "Vulkan" "D3D11" "D3D12" "Metal")
+
+foreach(renderer IN LISTS VOXLET_RENDERER_LIST)
+	string(TOUPPER ${renderer} rendererUppercase)
+	option(VOXLET_DISABLE_${rendererUppercase}_RENDERER "Disable the ${renderer} renderer of Voxlet" Off)
+endforeach()
+
+set(VOXLET_FORCE_RENDERER "None" CACHE STRING "Force a specific renderer of Voxlet. Some renderer may not be supported on all platform")
+set_property(CACHE VOXLET_FORCE_RENDERER PROPERTY STRINGS "None" ${VOXLET_RENDERER_LIST})
+
 
 # Setup some directory path
 set(VOXLET_ENGINE_DIR        ${PROJECT_SOURCE_DIR}/engine)
@@ -33,6 +43,9 @@ set(VOXLET_DOC_DIR           ${PROJECT_SOURCE_DIR}/doc)
 set(VOXLET_DOC_GENERATED_DIR ${VOXLET_DOC_DIR}/generated)
 set(VOXLET_DEPS_DIR          ${PROJECT_SOURCE_DIR}/deps)
 set(VOXLET_CMAKE_DIR         ${PROJECT_SOURCE_DIR}/cmake)
+
+# setup renderers
+include(${VOXLET_CMAKE_DIR}/renderer.cmake)
 
 
 # import flex
@@ -46,7 +59,10 @@ include(${VOXLET_CMAKE_DIR}/turbolin.cmake)
 find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3-shared)
 
 # import glad
-add_subdirectory(${VOXLET_DEPS_DIR}/glad)
+if (VOXLET_RENDERER_ENABLE_OpenGL)
+	add_subdirectory(${VOXLET_DEPS_DIR}/glad)
+	list(APPEND VOXLET_RENDERER_LIBRARIES glad::glad)
+endif()
 
 
 # include the different part of voxlet

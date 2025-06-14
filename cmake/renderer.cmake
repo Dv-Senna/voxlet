@@ -20,6 +20,8 @@ else()
 	endforeach()
 	if (NOT VOXLET_UNKNOWN_RENDERER)
 		message(FATAL_ERROR "Unknown renderer '${VOXLET_FORCE_RENDERER}' to force")
+	else()
+		set(VOXLET_RENDERER_FORCED On)
 	endif()
 endif()
 
@@ -34,15 +36,14 @@ if (NOT APPLE)
 endif()
 
 
-set(VOXLET_HAS_ONE_ENABLED_RENDERER Off)
+set(VOXLET_RENDERER_ENABLED_COUNT 0)
 foreach(renderer IN LISTS VOXLET_RENDERER_LIST)
 	if (${VOXLET_RENDERER_ENABLE_${renderer}})
-		set(VOXLET_HAS_ONE_ENABLED_RENDERER On)
-		break()
+		math(EXPR VOXLET_RENDERER_ENABLED_COUNT "${VOXLET_RENDERER_ENABLED_COUNT} + 1")
 	endif()
 endforeach()
 
-if (NOT VOXLET_HAS_ONE_ENABLED_RENDERER)
+if (${VOXLET_RENDERER_ENABLED_COUNT} EQUAL 0)
 	message(FATAL_ERROR "No renderer is enabled. This may be due to forcing an unsupported renderer for example")
 endif()
 

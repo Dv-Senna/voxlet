@@ -6,7 +6,7 @@
 
 #include <flex/bitfield.hpp>
 
-#include "voxlet/graphics/objectView.hpp"
+#include "voxlet/core.hpp"
 #include "voxlet/units.hpp"
 
 
@@ -30,4 +30,17 @@ namespace vx::graphics {
 		std::optional<std::span<const std::byte>> content;
 	};
 
+
+	template <BufferType type>
+	class Buffer {
+		using This = Buffer<type>;
+		Buffer(const This&) = delete;
+		auto operator=(const This&) -> This& = delete;
+
+		public:
+			constexpr Buffer() noexcept = default;
+			constexpr Buffer(This&&) noexcept = default;
+			constexpr auto operator=(This&&) noexcept -> This& = default;
+			VOXLET_GRAPHICS_VIRTUAL constexpr ~Buffer() = default;
+	};
 }

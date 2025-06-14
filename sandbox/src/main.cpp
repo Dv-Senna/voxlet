@@ -1,4 +1,5 @@
 #include "voxlet/error.hpp"
+#include "voxlet/graphics/buffer.hpp"
 #include <SDL3/SDL_video.h>
 #include <cstdlib>
 #include <cstring>
@@ -12,6 +13,8 @@
 #include <voxlet/instance.hpp>
 #include <voxlet/utils.hpp>
 #include <voxlet/logger.hpp>
+
+#include <voxlet/graphics/opengl/buffer.hpp>
 
 
 class SandboxApp final : public vx::Application {
@@ -51,6 +54,7 @@ auto vx::createApplication([[maybe_unused]] std::span<const std::string_view> ar
 }
 
 auto main(int argc, char **argv) -> int {
+	using namespace vx::units::bytes::literals;
 	auto args {std::span{argv, static_cast<std::size_t> (argc)}
 		| std::views::transform([](const char *arg) {return std::string_view{arg, std::strlen(arg)};})
 		| std::ranges::to<std::vector> ()
@@ -68,6 +72,20 @@ auto main(int argc, char **argv) -> int {
 	if (!instanceWithError)
 		return vx::Logger::global().fatal("Can't create instance : {}", instanceWithError.error()), EXIT_FAILURE;
 	auto instance {std::move(*instanceWithError)};
+
+
+	vx::graphics::BufferDescriptor bufferDescriptor {
+		.size = 64_MiB,
+		.access = {},//vx::graphics::BufferAccess::eCpuReadable,
+		.content = std::nullopt
+	};
+	vx::Failable bufferWithError {vx::graphics::opengl::Buffer<
+		vx::graphics::BufferType::eVertex
+	>::create(bufferDescriptor)};
+	if (!bufferWithError)
+		return vx::Logger::global().fatal("Can't create buffer : {}", instanceWithError.error()), EXIT_FAILURE;
+	auto buffer {std::move(*bufferWithError)};
+
 
 	bool running {true};
 	while (running) {

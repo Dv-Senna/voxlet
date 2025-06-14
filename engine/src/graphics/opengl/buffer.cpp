@@ -7,15 +7,17 @@
 
 
 namespace vx::graphics::opengl {
-	Buffer::~Buffer() {
+	BufferBase::~BufferBase() {
+		if (!m_built)
+			return;
 		if (m_buffer == 0)
 			return;
 		glDeleteBuffers(1, &m_buffer);
 	}
 
 
-	auto Buffer::create(const CreateInfos &createInfos) noexcept
-		-> vx::Failable<Buffer>
+	auto BufferBase::create(const CreateInfos &createInfos) noexcept
+		-> vx::Failable<BufferBase>
 	{
 		[[maybe_unused]] constexpr vx::EnumDispatcher bufferTypeDispatcher {
 			std::pair{BufferType::eVertex,             GL_ARRAY_BUFFER},
@@ -46,7 +48,8 @@ namespace vx::graphics::opengl {
 			data = createInfos.content->data();
 		}
 
-		Buffer buffer {};
+		BufferBase buffer {};
+		buffer.m_built = true;
 		glCreateBuffers(1, &buffer.m_buffer);
 		auto bufferStorageError {vx::graphics::opengl::call(glNamedBufferStorage,
 			buffer.m_buffer,

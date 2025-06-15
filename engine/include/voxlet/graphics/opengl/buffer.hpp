@@ -26,12 +26,23 @@ namespace vx::graphics::opengl {
 			VOXLET_CORE static auto create(const CreateInfos &createInfos) noexcept
 				-> vx::Failable<BufferBase>;
 
+			VOXLET_CORE auto write(vx::Byte offset, std::span<const std::byte> content) noexcept
+				-> vx::Failable<void>;
+			VOXLET_CORE auto read(vx::Byte offset, std::span<std::byte> buffer) noexcept
+				-> vx::Failable<void>;
+
 			inline auto getBuffer() const noexcept -> GLuint {return m_buffer;}
+			inline auto getSize() const noexcept -> vx::Byte {return m_size;}
 
 		private:
+			VOXLET_CORE static auto s_chekContentValidity(const CreateInfos &createInfos) noexcept
+				-> vx::Failable<const std::byte*>;
+
 			vx::BuiltFlag m_built;
 			GLuint m_buffer;
+			vx::Byte m_size;
 			flex::Bitfield<BufferAccess> m_access;
+			std::byte *m_map;
 	};
 
 
@@ -55,6 +66,13 @@ namespace vx::graphics::opengl {
 				buffer.m_base = std::move(*baseWithError);
 				return buffer;
 			}
+
+			inline auto write(vx::Byte offset, std::span<const std::byte> content) noexcept
+				-> vx::Failable<void> override {return m_base.write(offset, content);}
+			inline auto read(vx::Byte offset, std::span<std::byte> content) noexcept
+				-> vx::Failable<void> override {return m_base.read(offset, content);}
+
+			inline auto getSize() const noexcept -> vx::Byte override {return m_base.getSize();}
 
 		private:
 			BufferBase m_base;

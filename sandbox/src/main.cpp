@@ -60,7 +60,7 @@ auto main(int argc, char **argv) -> int {
 		| std::ranges::to<std::vector> ()
 	};
 	vx::Failable appWithError {vx::createApplication(args)};
-	if (!appWithError)
+	if (!appWithError) [[unlikely]]
 		return vx::Logger::global().fatal("Can't create app : {}", appWithError.error()), EXIT_FAILURE;
 	auto application {std::move(*appWithError)};
 
@@ -69,22 +69,41 @@ auto main(int argc, char **argv) -> int {
 		.args = args
 	};
 	vx::Failable instanceWithError {vx::Instance::create(instanceCreateInfos)};
-	if (!instanceWithError)
+	if (!instanceWithError) [[unlikely]]
 		return vx::Logger::global().fatal("Can't create instance : {}", instanceWithError.error()), EXIT_FAILURE;
 	auto instance {std::move(*instanceWithError)};
 
 
+	std::array initialBufferData {
+		-0.5f, -0.5f,  1.f, 0.f, 0.f,
+		0.5f, -0.5f,   0.f, 1.f, 0.f,
+		0.f, 0.5f,     0.f, 0.f, 1.f
+	};
+
+	std::vector<float> readBackBuffer {};
+	readBackBuffer.resize(initialBufferData.size());
+
 	vx::graphics::BufferDescriptor bufferDescriptor {
 		.size = 64_MiB,
-		.access = {},//vx::graphics::BufferAccess::eCpuReadable,
+		.access = vx::graphics::BufferAccess::eCpuWritable | vx::graphics::BufferAccess::eCpuReadable,
 		.content = std::nullopt
 	};
 	vx::Failable bufferWithError {vx::graphics::opengl::Buffer<
 		vx::graphics::BufferType::eVertex
 	>::create(bufferDescriptor)};
-	if (!bufferWithError)
-		return vx::Logger::global().fatal("Can't create buffer : {}", instanceWithError.error()), EXIT_FAILURE;
+	if (!bufferWithError) [[unlikely]]
+		return vx::Logger::global().fatal("Can't create buffer : {}", bufferWithError.error()), EXIT_FAILURE;
 	auto buffer {std::move(*bufferWithError)};
+
+
+	vx::Failable bufferWriteError {buffer.write(0_B, std::as_bytes(std::span{initialBufferData}))};
+	if (!bufferWriteError)
+		return vx::Logger::global().fatal("Can't write data to buffer : {}", bufferWriteError.error()), EXIT_FAILURE;
+
+	vx::Failable bufferReadError {buffer.read(0_B, std::as_writable_bytes(std::span{readBackBuffer}))};
+	if (!bufferReadError)
+		return vx::Logger::global().fatal("Can't read data from buffer : {}", bufferReadError.error()), EXIT_FAILURE;
+	vx::Logger::global().info("Data in buffer : {}", readBackBuffer);
 
 
 	bool running {true};
@@ -97,7 +116,7 @@ auto main(int argc, char **argv) -> int {
 				running = false;
 		}
 
-		if (!SDL_GL_SwapWindow(instance.getWindow().getWindow()))
+		if (!SDL_GL_SwapWindow(instance.getWindow().getWindow())) [[unlikely]]
 			return vx::Logger::global().fatal("Can't swap window : {}", SDL_GetError()), EXIT_FAILURE;
 	}
 

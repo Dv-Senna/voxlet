@@ -5,8 +5,10 @@
 #include <span>
 
 #include <flex/bitfield.hpp>
+#include <flex/reflection/enums.hpp>
 
 #include "voxlet/core.hpp"
+#include "voxlet/error.hpp"
 #include "voxlet/units.hpp"
 
 
@@ -41,6 +43,15 @@ namespace vx::graphics {
 			constexpr Buffer() noexcept = default;
 			constexpr Buffer(This&&) noexcept = default;
 			constexpr auto operator=(This&&) noexcept -> This& = default;
-			VOXLET_GRAPHICS_VIRTUAL constexpr ~Buffer() = default;
+			virtual constexpr ~Buffer() = default;
+
+			virtual auto write(vx::Byte offset, std::span<const std::byte> content) noexcept
+				-> vx::Failable<void> = 0;
+			virtual auto read(vx::Byte offset, std::span<std::byte> buffer) noexcept
+				-> vx::Failable<void> = 0;
+
+			virtual auto getSize() const noexcept -> vx::Byte = 0;
 	};
 }
+
+FLEX_MAKE_ENUM_BITFLAG(vx::graphics::BufferAccess);

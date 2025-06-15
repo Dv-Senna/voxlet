@@ -62,7 +62,15 @@ namespace vx {
 		 * @brief Indicate that the specifier of the object you want to view into
 		 *        is not the same as the one of the view
 		 * */
-		eInvalidObjectViewSpec
+		eInvalidObjectViewSpec,
+		/**
+		 * @brief Indicate that you tried to write to a non-writable buffer
+		 * */
+		eBufferNotWritable,
+		/**
+		 * @brief Indicate that you tried to write to a non-readable buffer
+		 * */
+		eBufferNotReadable,
 	};
 
 	/**

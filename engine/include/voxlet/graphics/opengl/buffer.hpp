@@ -53,7 +53,7 @@ namespace vx::graphics::opengl {
 			constexpr Buffer() noexcept = default;
 			constexpr Buffer(This&&) noexcept = default;
 			constexpr auto operator=(This&&) noexcept -> This& = default;
-			constexpr ~Buffer() VOXLET_GRAPHICS_OVERRIDE = default;
+			constexpr ~Buffer() override = default;
 
 			static inline auto create(const vx::graphics::BufferDescriptor &descriptor) noexcept
 				-> vx::Failable<This>

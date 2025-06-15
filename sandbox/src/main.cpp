@@ -80,9 +80,6 @@ auto main(int argc, char **argv) -> int {
 		0.f, 0.5f,     0.f, 0.f, 1.f
 	};
 
-	std::vector<float> readBackBuffer {};
-	readBackBuffer.resize(initialBufferData.size());
-
 	vx::graphics::BufferDescriptor bufferDescriptor {
 		.size = 64_MiB,
 		.access = vx::graphics::BufferAccess::eCpuWritable | vx::graphics::BufferAccess::eCpuReadable,
@@ -95,15 +92,9 @@ auto main(int argc, char **argv) -> int {
 		return vx::Logger::global().fatal("Can't create buffer : {}", bufferWithError.error()), EXIT_FAILURE;
 	auto buffer {std::move(*bufferWithError)};
 
-
 	vx::Failable bufferWriteError {buffer.write(0_B, std::as_bytes(std::span{initialBufferData}))};
 	if (!bufferWriteError)
 		return vx::Logger::global().fatal("Can't write data to buffer : {}", bufferWriteError.error()), EXIT_FAILURE;
-
-	vx::Failable bufferReadError {buffer.read(0_B, std::as_writable_bytes(std::span{readBackBuffer}))};
-	if (!bufferReadError)
-		return vx::Logger::global().fatal("Can't read data from buffer : {}", bufferReadError.error()), EXIT_FAILURE;
-	vx::Logger::global().info("Data in buffer : {}", readBackBuffer);
 
 
 	bool running {true};

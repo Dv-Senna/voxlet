@@ -4,6 +4,7 @@
 
 #include <compare>
 #include <cstdint>
+#include <filesystem>
 #include <format>
 #include <iterator>
 #include <ranges>
@@ -12,8 +13,13 @@
 
 #include <flex/pipes/toNumber.hpp>
 
+#include "voxlet/core.hpp"
+#include "voxlet/error.hpp"
+
 
 namespace vx {
+	VOXLET_CORE auto readBinaryFile(const std::filesystem::path &path) noexcept -> vx::Failable<std::vector<std::byte>>;
+
 	/**
 	 * @brief Used to produce a compile-time error in consteval context
 	 * @ingroup error

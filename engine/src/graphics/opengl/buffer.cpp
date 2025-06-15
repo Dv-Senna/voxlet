@@ -129,8 +129,8 @@ namespace vx::graphics::opengl {
 	}
 
 	auto BufferBase::read(vx::Byte offset, std::span<std::byte> buffer) noexcept -> vx::Failable<void> {
-		if (!(m_access & vx::graphics::BufferAccess::eCpuWritable))
-			return vx::makeErrorStack(vx::ErrorCode::eBufferNotWritable);
+		if (!(m_access & vx::graphics::BufferAccess::eCpuReadable))
+			return vx::makeErrorStack(vx::ErrorCode::eBufferNotReadable);
 		if (buffer.size_bytes() > static_cast<std::size_t> (m_size - offset)) {
 			return vx::makeErrorStack(vx::ErrorCode::eDataTooSmall,
 				"Can't read from buffer as the buffer is too small"

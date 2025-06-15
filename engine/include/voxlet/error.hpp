@@ -71,6 +71,10 @@ namespace vx {
 		 * @brief Indicate that you tried to write to a non-readable buffer
 		 * */
 		eBufferNotReadable,
+		/**
+		 * @brief Indicate an invalid path
+		 * */
+		eInvalidPath
 	};
 
 	/**

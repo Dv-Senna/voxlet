@@ -40,6 +40,12 @@ namespace vx::graphics {
 		std::tuple<vx::graphics::ShaderModule<stages>&...> shaderModules;
 	};
 
+	template <vx::graphics::ShaderModuleStage ...stages>
+	PipelineDescriptor(
+		std::vector<PipelineAttribute>,
+		std::tuple<vx::graphics::ShaderModule<stages>&...>
+	) -> PipelineDescriptor<stages...>;
+
 
 	class Pipeline {
 		Pipeline(const Pipeline&) = delete;

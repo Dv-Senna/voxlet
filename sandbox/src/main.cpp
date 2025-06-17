@@ -105,15 +105,39 @@ auto main(int argc, char **argv) -> int {
 		return vx::Logger::global().fatal("Can't get exe directory : {}", exeDirectoryWithError.error()), EXIT_FAILURE;
 	const std::filesystem::path exeDirectory {*exeDirectoryWithError};
 
-	vx::graphics::ShaderModuleDescriptor shaderModuleDescriptor {
+	vx::graphics::ShaderModuleDescriptor vertexShaderModuleDescriptor {
 		.source = exeDirectory / "shaders/triangle.vert",
 		.entryPoint = "main"
 	};
 	vx::Failable vertexShaderWithError {vx::graphics::opengl::ShaderModule<
 		vx::graphics::ShaderModuleStage::eVertex
-	>::create(shaderModuleDescriptor)};
+	>::create(vertexShaderModuleDescriptor)};
 	if (!vertexShaderWithError)
 		return vx::Logger::global().fatal("Can't create vertex shader : {}", vertexShaderWithError.error()), EXIT_FAILURE;
+	auto vertexShader {std::move(*vertexShaderWithError)};
+
+	vx::graphics::ShaderModuleDescriptor fragmentModuleDescriptor {
+		.source = exeDirectory / "shaders/triangle.frag",
+		.entryPoint = "main"
+	};
+	vx::Failable fragmentShaderWithError {vx::graphics::opengl::ShaderModule<
+		vx::graphics::ShaderModuleStage::eFragment
+	>::create(fragmentModuleDescriptor)};
+	if (!fragmentShaderWithError)
+		return vx::Logger::global().fatal("Can't create vertex shader : {}", fragmentShaderWithError.error()), EXIT_FAILURE;
+	auto fragmentShader {std::move(*fragmentShaderWithError)};
+
+	vx::graphics::PipelineDescriptor pipelineDescriptor {
+		.attributes = {},
+		.shaderModules = std::tie(
+			static_cast<vx::graphics::ShaderModule<vx::graphics::ShaderModuleStage::eVertex>&> (vertexShader),
+			static_cast<vx::graphics::ShaderModule<vx::graphics::ShaderModuleStage::eFragment>&> (fragmentShader)
+		)
+	};
+	vx::Failable pipelineWithError {vx::graphics::opengl::Pipeline::create(pipelineDescriptor)};
+	if (!pipelineWithError)
+		return vx::Logger::global().fatal("Can't create pipeline : {}", pipelineWithError.error()), EXIT_FAILURE;
+	auto pipeline {std::move(*pipelineWithError)};
 
 
 	bool running {true};

@@ -4,8 +4,10 @@
 
 #include <glad/glad.h>
 
+#include "flex/typeTraits.hpp"
 #include "voxlet/graphics/opengl/shaderModule.hpp"
 #include "voxlet/graphics/pipeline.hpp"
+#include "voxlet/graphics/shaderModule.hpp"
 #include "voxlet/object.hpp"
 
 
@@ -17,6 +19,13 @@ namespace vx::graphics::opengl {
 			vx::UUID uuid;
 		};
 
+		template <typename>
+		struct stage_extractor {};
+
+		template <vx::graphics::ShaderModuleStage stage>
+		struct stage_extractor<vx::graphics::ShaderModule<stage>> : flex::value_constant<stage> {};
+
+
 		public:
 			constexpr Pipeline() = default;
 			constexpr Pipeline(Pipeline&&) noexcept = default;
@@ -27,14 +36,22 @@ namespace vx::graphics::opengl {
 			static auto create(const vx::graphics::PipelineDescriptor<stages...> &createInfos) noexcept
 				-> vx::Failable<Pipeline>
 			{
+				std::tuple narrowShaderModules {std::apply([](auto &...shaderModules) {
+					return std::tie(static_cast<
+						vx::graphics::opengl::ShaderModule<
+							stage_extractor<std::remove_cvref_t<decltype(shaderModules)>>::value
+						>&
+					> (shaderModules)...);
+				}, createInfos.shaderModules)};
+
 				std::array<ShaderModulePayload, sizeof...(stages)> shaderModules {};
-				std::apply([&shaderModules](const auto &...modules) noexcept {
-						shaderModules = std::array{ShaderModulePayload{
-							.stage        = modules.getInternalObject(),
-							.shaderModule = modules.getStage(),
-							.uuid         = modules.getUUID()
-						}...};
-				}, createInfos.shaderModules);
+				std::apply([&shaderModules](auto &...modules) noexcept {
+					shaderModules = std::array{ShaderModulePayload{
+						.stage        = modules.getBase().getStage(),
+						.shaderModule = modules.getBase().getInternalObject(),
+						.uuid         = modules.getUUID()
+					}...};
+				}, narrowShaderModules);
 				return s_create(createInfos.attributes, shaderModules);
 			}
 

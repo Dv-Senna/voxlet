@@ -77,6 +77,9 @@ namespace vx::graphics::opengl {
 			}
 			inline auto getUUID() const noexcept -> vx::UUID override {return m_base.getUUID();}
 
+			inline auto getBase() noexcept -> ShaderModuleBase& {return m_base;}
+
+
 		private:
 			ShaderModuleBase m_base;
 	};

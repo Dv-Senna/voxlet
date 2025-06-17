@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <expected>
+#include <filesystem>
 #include <format>
 #include <ranges>
 
@@ -15,6 +16,7 @@
 #include <voxlet/logger.hpp>
 
 #include <voxlet/graphics/opengl/buffer.hpp>
+#include <voxlet/graphics/opengl/pipeline.hpp>
 
 
 class SandboxApp final : public vx::Application {
@@ -95,6 +97,12 @@ auto main(int argc, char **argv) -> int {
 	vx::Failable bufferWriteError {buffer.write(0_B, std::as_bytes(std::span{initialBufferData}))};
 	if (!bufferWriteError)
 		return vx::Logger::global().fatal("Can't write data to buffer : {}", bufferWriteError.error()), EXIT_FAILURE;
+
+
+	vx::graphics::ShaderModuleDescriptor shaderModuleDescriptor {
+		.source = *vx::getExeDirectory() / "shaders/triangle.vert",
+		.entryPoint = "main"
+	};
 
 
 	bool running {true};

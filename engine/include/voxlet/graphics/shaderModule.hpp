@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <string_view>
 
+#include "voxlet/utils.hpp"
+
 
 namespace vx::graphics {
 	enum class ShaderModuleStage : std::uint8_t {
@@ -35,5 +37,6 @@ namespace vx::graphics {
 
 			virtual auto getSourcePath() const noexcept -> const std::filesystem::path& = 0;
 			virtual auto getEntryPoint() const noexcept -> std::string_view = 0;
+			virtual auto getUUID() const noexcept -> vx::UUID = 0;
 	};
 }

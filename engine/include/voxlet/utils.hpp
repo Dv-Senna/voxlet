@@ -21,8 +21,8 @@
 namespace vx {
 	VOXLET_CORE auto readBinaryFile(const std::filesystem::path &path) noexcept
 		-> vx::Failable<std::vector<std::byte>>;
-	VOXLET_CORE auto getExePath() noexcept -> vx::Failable<flex::Reference<const std::filesystem::path>>;
-	VOXLET_CORE auto getExeDirectory() noexcept -> vx::Failable<flex::Reference<const std::filesystem::path>>;
+	VOXLET_CORE auto getExePath() noexcept -> vx::Failable<std::filesystem::path>;
+	VOXLET_CORE auto getExeDirectory() noexcept -> vx::Failable<std::filesystem::path>;
 
 	using UUID = std::uint64_t;
 

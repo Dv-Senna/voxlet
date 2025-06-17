@@ -21,7 +21,7 @@ namespace vx {
 	}
 
 
-	auto getExePath() noexcept -> vx::Failable<flex::Reference<const std::filesystem::path>> {
+	auto getExePath() noexcept -> vx::Failable<std::filesystem::path> {
 		static std::optional<std::filesystem::path> cachedExePath {};
 		if (cachedExePath)
 			return *cachedExePath;
@@ -43,12 +43,14 @@ namespace vx {
 	}
 
 
-	auto getExeDirectory() noexcept -> vx::Failable<flex::Reference<const std::filesystem::path>> {
+	auto getExeDirectory() noexcept -> vx::Failable<std::filesystem::path> {
 		static std::optional<std::filesystem::path> cachedExeDirectory {};
 		if (cachedExeDirectory)
 			return *cachedExeDirectory;
-		return vx::getExePath()
-			.transform([](std::filesystem::path path) {return path.remove_filename();})
-			.transform([&](const auto &path) {cachedExeDirectory = path; return path;});
+		auto exePath {vx::getExePath()};
+		if (!exePath)
+			return std::unexpected{exePath.error()};
+		cachedExeDirectory = exePath->remove_filename();
+		return *cachedExeDirectory;
 	}
 }

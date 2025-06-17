@@ -1,5 +1,6 @@
 #include "voxlet/error.hpp"
 #include "voxlet/graphics/buffer.hpp"
+#include "voxlet/graphics/shaderModule.hpp"
 #include <SDL3/SDL_video.h>
 #include <cstdlib>
 #include <cstring>
@@ -99,10 +100,20 @@ auto main(int argc, char **argv) -> int {
 		return vx::Logger::global().fatal("Can't write data to buffer : {}", bufferWriteError.error()), EXIT_FAILURE;
 
 
+	vx::Failable exeDirectoryWithError {vx::getExeDirectory()};
+	if (!exeDirectoryWithError)
+		return vx::Logger::global().fatal("Can't get exe directory : {}", exeDirectoryWithError.error()), EXIT_FAILURE;
+	const std::filesystem::path exeDirectory {*exeDirectoryWithError};
+
 	vx::graphics::ShaderModuleDescriptor shaderModuleDescriptor {
-		.source = *vx::getExeDirectory() / "shaders/triangle.vert",
+		.source = exeDirectory / "shaders/triangle.vert",
 		.entryPoint = "main"
 	};
+	vx::Failable vertexShaderWithError {vx::graphics::opengl::ShaderModule<
+		vx::graphics::ShaderModuleStage::eVertex
+	>::create(shaderModuleDescriptor)};
+	if (!vertexShaderWithError)
+		return vx::Logger::global().fatal("Can't create vertex shader : {}", vertexShaderWithError.error()), EXIT_FAILURE;
 
 
 	bool running {true};

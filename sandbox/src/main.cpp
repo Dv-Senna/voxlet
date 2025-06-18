@@ -12,6 +12,7 @@
 #include <SDL3/SDL.h>
 
 #include <voxlet/application.hpp>
+#include <voxlet/data/database.hpp>
 #include <voxlet/instance.hpp>
 #include <voxlet/utils.hpp>
 #include <voxlet/logger.hpp>
@@ -77,6 +78,16 @@ auto main(int argc, char **argv) -> int {
 	auto instance {std::move(*instanceWithError)};
 
 
+	vx::data::Database::CreateInfos databaseCreateInfos {
+		.instance = instance,
+		.name = "graphics"
+	};
+	vx::Failable databaseWithError {vx::data::Database::create(databaseCreateInfos)};
+	if (!databaseWithError)
+		return vx::Logger::global().fatal("Can't create database : {}", databaseWithError.error()), EXIT_FAILURE;
+	auto database {std::move(*databaseWithError)};
+
+
 	std::array initialBufferData {
 		-0.5f, -0.5f,  1.f, 0.f, 0.f,
 		0.5f, -0.5f,   0.f, 1.f, 0.f,
@@ -100,12 +111,9 @@ auto main(int argc, char **argv) -> int {
 		return vx::Logger::global().fatal("Can't write data to buffer : {}", bufferWriteError.error()), EXIT_FAILURE;
 
 
-	vx::Failable exeDirectoryWithError {vx::getExeDirectory()};
-	if (!exeDirectoryWithError)
-		return vx::Logger::global().fatal("Can't get exe directory : {}", exeDirectoryWithError.error()), EXIT_FAILURE;
-	const std::filesystem::path exeDirectory {*exeDirectoryWithError};
+	[[maybe_unused]] auto &exeDirectory {instance.getWorkDirectory()};
 
-	vx::graphics::ShaderModuleDescriptor vertexShaderModuleDescriptor {
+/*	vx::graphics::ShaderModuleDescriptor vertexShaderModuleDescriptor {
 		.source = exeDirectory / "shaders/triangle.vert",
 		.entryPoint = "main"
 	};
@@ -137,7 +145,7 @@ auto main(int argc, char **argv) -> int {
 	vx::Failable pipelineWithError {vx::graphics::opengl::Pipeline::create(pipelineDescriptor)};
 	if (!pipelineWithError)
 		return vx::Logger::global().fatal("Can't create pipeline : {}", pipelineWithError.error()), EXIT_FAILURE;
-	auto pipeline {std::move(*pipelineWithError)};
+	auto pipeline {std::move(*pipelineWithError)};*/
 
 
 	bool running {true};

@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <ranges>
 
 #ifdef __linux__
 	#include <unistd.h>
@@ -11,8 +12,12 @@
 namespace vx {
 	auto readBinaryFile(const std::filesystem::path &path) noexcept -> vx::Failable<std::vector<std::byte>> {
 		std::ifstream file {path, std::ios::binary};
-		if (!file)
-			return vx::makeErrorStack(vx::ErrorCode::eInvalidPath, "Can't open binary file to read");
+		if (!file) {
+			return vx::makeErrorStack(vx::ErrorCode::eInvalidPath,
+				"Can't open binary file '{}' to read",
+				path.string()
+			);
+		}
 
 		const auto length {std::filesystem::file_size(path)};
 		std::vector<std::byte> result (length);
@@ -52,5 +57,23 @@ namespace vx {
 			return std::unexpected{exePath.error()};
 		cachedExeDirectory = exePath->remove_filename();
 		return *cachedExeDirectory;
+	}
+
+
+	auto createDirectory(const std::filesystem::path &path) noexcept -> vx::Failable<bool> {
+		std::error_code errorCode {};
+		bool res {std::filesystem::create_directory(path, errorCode)};
+		if (errorCode)
+			return vx::makeErrorStack("Can't create directory : {}", errorCode.value());
+		return res;
+	}
+
+
+	auto createDirectoryRecursively(const std::filesystem::path &path) noexcept -> vx::Failable<bool> {
+		std::error_code errorCode {};
+		bool res {std::filesystem::create_directories(path, errorCode)};
+		if (errorCode)
+			return vx::makeErrorStack("Can't create directory recursively : {}", errorCode.value());
+		return res;
 	}
 }

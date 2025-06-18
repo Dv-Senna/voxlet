@@ -17,6 +17,7 @@ target_include_directories(voxlet_header_engine INTERFACE
 target_link_libraries(voxlet_header_engine INTERFACE
 	flex::flex_header_only
 	SDL3::SDL3
+	SQLite::SQLite3
 	turbolin::turbolin
 	${VOXLET_RENDERER_LIBRARIES}
 )

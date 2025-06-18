@@ -56,7 +56,5 @@ namespace vx::graphics {
 			constexpr Pipeline(Pipeline&&) noexcept = default;
 			constexpr auto operator=(Pipeline&&) noexcept -> Pipeline& = default;
 			virtual constexpr ~Pipeline() = default;
-
-			virtual auto getUUID() const noexcept -> vx::UUID = 0;
 	};
 }

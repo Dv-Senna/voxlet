@@ -16,7 +16,6 @@ namespace vx::graphics::opengl {
 		struct ShaderModulePayload {
 			vx::graphics::ShaderModuleStage stage;
 			GLuint shaderModule;
-			vx::UUID uuid;
 		};
 
 		template <typename>
@@ -48,16 +47,12 @@ namespace vx::graphics::opengl {
 				std::apply([&shaderModules](auto &...modules) noexcept {
 					shaderModules = std::array{ShaderModulePayload{
 						.stage        = modules.getBase().getStage(),
-						.shaderModule = modules.getBase().getInternalObject(),
-						.uuid         = modules.getUUID()
+						.shaderModule = modules.getBase().getInternalObject()
 					}...};
 				}, narrowShaderModules);
 				return s_create(createInfos.attributes, shaderModules);
 			}
 
-			inline auto getUUID() const noexcept -> vx::UUID override {
-//				return static_cast<vx::UUID> (0);
-			}
 
 		private:
 			VOXLET_CORE static auto s_create(

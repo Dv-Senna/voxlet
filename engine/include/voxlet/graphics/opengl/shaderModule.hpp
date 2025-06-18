@@ -30,12 +30,6 @@ namespace vx::graphics::opengl {
 
 			inline auto getSourcePath() const noexcept -> const std::filesystem::path& {return m_sourcePath;}
 			inline auto getEntryPoint() const noexcept -> std::string_view {return m_entryPoint;}
-			inline auto getUUID() const noexcept -> vx::UUID {
-				return static_cast<vx::UUID> (std::hash<std::filesystem::path> {}(m_sourcePath))
-					^ static_cast<vx::UUID> (std::hash<std::string> {}(m_entryPoint))
-					^ static_cast<vx::UUID> (std::to_underlying(m_stage));
-			}
-
 			inline auto getInternalObject() const noexcept -> GLuint {return m_shaderModule;}
 			inline auto getStage() const noexcept -> vx::graphics::ShaderModuleStage {return m_stage;}
 
@@ -75,7 +69,6 @@ namespace vx::graphics::opengl {
 			inline auto getEntryPoint() const noexcept -> std::string_view override {
 				return m_base.getEntryPoint();
 			}
-			inline auto getUUID() const noexcept -> vx::UUID override {return m_base.getUUID();}
 
 			inline auto getBase() noexcept -> ShaderModuleBase& {return m_base;}
 

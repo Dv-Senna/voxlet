@@ -27,7 +27,7 @@ namespace vx {
 			/**
 			 * @brief Move constructor
 			 * */
-			constexpr Instance(Instance&&) noexcept = default;
+			inline Instance(Instance&&) noexcept = default;
 
 			/**
 			 * @brief Informations to create the instance
@@ -55,13 +55,17 @@ namespace vx {
 
 			inline auto getGraphicsContext() noexcept -> vx::graphics::Context& {return m_graphicsContext;}
 			inline auto getWindow() noexcept -> vx::graphics::Window& {return m_window;}
+			inline auto getWorkDirectory() const noexcept -> const std::filesystem::path& {
+				return m_workDirectory;
+			}
 
 		private:
-			constexpr Instance() noexcept = default;
+			inline Instance() noexcept = default;
 
 			vx::BuiltFlag m_built;
 			vx::graphics::Context m_graphicsContext;
 			vx::graphics::Window m_window;
+			std::filesystem::path m_workDirectory;
 	};
 
 	static_assert(vx::object<Instance>);

@@ -21,6 +21,11 @@ namespace vx {
 		Instance instance {};
 		instance.m_built = true;
 
+		vx::Failable workDirectoryWithError {vx::getExeDirectory()};
+		if (!workDirectoryWithError)
+			return vx::addErrorToStack(workDirectoryWithError, "Can't get work directory of Voxlet");
+		instance.m_workDirectory = std::move(*workDirectoryWithError);
+
 		vx::graphics::Context::CreateInfos graphicsContextCreateInfos {
 			.appInfos = createInfos.appInfos
 		};

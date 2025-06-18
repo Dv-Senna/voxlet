@@ -23,6 +23,10 @@ namespace vx {
 		-> vx::Failable<std::vector<std::byte>>;
 	VOXLET_CORE auto getExePath() noexcept -> vx::Failable<std::filesystem::path>;
 	VOXLET_CORE auto getExeDirectory() noexcept -> vx::Failable<std::filesystem::path>;
+	VOXLET_CORE auto createDirectory(const std::filesystem::path &path) noexcept
+		-> vx::Failable<bool>;
+	VOXLET_CORE auto createDirectoryRecursively(const std::filesystem::path &path) noexcept
+		-> vx::Failable<bool>;
 
 	using UUID = std::uint64_t;
 

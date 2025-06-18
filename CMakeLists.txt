@@ -58,6 +58,9 @@ include(${VOXLET_CMAKE_DIR}/turbolin.cmake)
 # import SDL3
 find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3-shared)
 
+# import SQLite3
+find_package(SQLite3 REQUIRED)
+
 # import glad
 if (VOXLET_RENDERER_ENABLE_OpenGL)
 	add_subdirectory(${VOXLET_DEPS_DIR}/glad)

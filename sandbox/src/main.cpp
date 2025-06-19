@@ -87,6 +87,16 @@ auto main(int argc, char **argv) -> int {
 		return vx::Logger::global().fatal("Can't create database : {}", databaseWithError.error()), EXIT_FAILURE;
 	auto database {std::move(*databaseWithError)};
 
+	databaseCreateInfos.name = std::nullopt;
+	databaseWithError = vx::data::Database::create(databaseCreateInfos);
+	if (!databaseWithError)
+		return vx::Logger::global().fatal("Can't create in memory database : {}", databaseWithError.error()), EXIT_FAILURE;
+	auto inMemoryDatabase {std::move(*databaseWithError)};
+
+	auto databaseAttachmentError {inMemoryDatabase.attach(database)};
+	if (!databaseAttachmentError)
+		return vx::Logger::global().fatal("Can't attach database : {}", databaseAttachmentError.error()), EXIT_FAILURE;
+
 
 	std::array initialBufferData {
 		-0.5f, -0.5f,  1.f, 0.f, 0.f,

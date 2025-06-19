@@ -74,7 +74,11 @@ namespace vx {
 		/**
 		 * @brief Indicate an invalid path
 		 * */
-		eInvalidPath
+		eInvalidPath,
+		/**
+		 * @brief Indicate an invalid argument
+		 * */
+		eInvalidArgument,
 	};
 
 	/**

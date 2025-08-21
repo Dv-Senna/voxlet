@@ -28,3 +28,4 @@ target_include_directories(engine
 )
 target_compile_features(engine PUBLIC cxx_std_23)
 target_compile_options(engine PRIVATE -Wall -Wextra -Wpedantic)
+target_compile_options(engine PUBLIC -mavx2)

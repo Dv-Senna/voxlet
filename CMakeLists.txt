@@ -10,6 +10,11 @@ if (MSVC)
 	message(FATAL_ERROR "MSVC is not supported")
 endif()
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/dependencies.cmake)
+
+find_package(Catch2)
+
+
 # include the different part of voxlet
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/engine)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/doc)

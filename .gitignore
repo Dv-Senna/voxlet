@@ -17,6 +17,10 @@ doc/generated/*
 # cmake stuffs
 __cmake_systeminformation/*
 
+# vendors
+vendors/*
+!vendors/glad/*
+
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudio,visualstudiocode,vim,clion
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudio,visualstudiocode,vim,clion

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "voxlet/core.hpp"
+#include "voxlet/export.hpp"
 
 
 namespace vx {
-	VOXLET_CORE auto test() noexcept -> void;
+	VOXLET_EXPORT auto test() noexcept -> void;
 
 } // namespace vx

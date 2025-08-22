@@ -6,32 +6,77 @@
 #include <voxlet/containers/string.hpp>
 
 
+auto isEmpty(const vx::String& str) -> void {
+	REQUIRE(str.isShort());
+	REQUIRE(str.empty());
+	REQUIRE(str.size() == 0uz);
+	REQUIRE(str.capacity() >= str.size());
+	for (const auto i : std::views::iota(0uz, str.capacity()))
+		REQUIRE(str.getData()[i] == u8'\0');
+}
+
+template <std::size_t N>
+auto isShort(const vx::String& str, const char8_t (&literal)[N]) -> void {
+	REQUIRE(str.isShort());
+	REQUIRE(!str.empty());
+	REQUIRE(str.size() == N - 1uz);
+	REQUIRE(str.capacity() >= str.size());
+	for (const auto i : std::views::iota(0uz, str.size()))
+		REQUIRE(str.getData()[i] == literal[i]);
+}
+
+template <std::size_t N>
+auto isLong(const vx::String& str, const char8_t (&literal)[N]) -> void {
+	REQUIRE(!str.isShort());
+	REQUIRE(!str.empty());
+	REQUIRE(str.size() == N - 1uz);
+	REQUIRE(str.capacity() == str.size());
+	for (const auto i : std::views::iota(0uz, str.size()))
+		REQUIRE(str.getData()[i] == literal[i]);
+}
+
+auto isEqual(const vx::String& lhs, const vx::String& rhs) -> void {
+	REQUIRE(lhs.size() == rhs.size());
+	for (const auto i : std::views::iota(0uz, lhs.size()))
+		REQUIRE(lhs.getData()[i] == rhs.getData()[i]);
+}
+
+
 TEST_CASE("string", "[containers]") {
-	SECTION("constructor") {
-		vx::String emptyStr {};
-		REQUIRE(emptyStr.isShort());
-		REQUIRE(emptyStr.empty());
-		REQUIRE(emptyStr.size() == 0uz);
-		REQUIRE(emptyStr.capacity() >= emptyStr.size());
-		for (const auto i : std::views::iota(0uz, emptyStr.capacity()))
-			REQUIRE(emptyStr.getData()[i] == u8'\0');
+	const char8_t shortLiteral[] {u8"Hello World!"};
+	const char8_t longLiteral[] {u8"Hello World! I really want this string to be non-SSO, so its long"};
 
-		const char8_t shortLiterals[] {u8"Hello World!"};
-		vx::String shortStr {vx::String::from(shortLiterals)};
-		REQUIRE(shortStr.isShort());
-		REQUIRE(!shortStr.empty());
-		REQUIRE(shortStr.size() == sizeof(shortLiterals) - 1uz);
-		REQUIRE(shortStr.capacity() >= shortStr.size());
-		for (const auto i : std::views::iota(0uz, shortStr.size()))
-			REQUIRE(shortStr.getData()[i] == shortLiterals[i]);
+	vx::String emptyStr {};
+	vx::String shortStr {vx::String::from(shortLiteral)};
+	vx::String longStr {vx::String::from(longLiteral)};
 
-		const char8_t longLiterals[] {u8"Hello World! I really want this string to be non-SSO, so its long"};
-		vx::String longStr {vx::String::from(longLiterals)};
-		REQUIRE(!longStr.isShort());
-		REQUIRE(!longStr.empty());
-		REQUIRE(longStr.size() == sizeof(longLiterals) - 1uz);
-		REQUIRE(longStr.capacity() == longStr.size());
-		for (const auto i : std::views::iota(0uz, longStr.size()))
-			REQUIRE(longStr.getData()[i] == longLiterals[i]);
+	SECTION("from") {
+		isEmpty(emptyStr);
+		isShort(shortStr, shortLiteral);
+		isLong(longStr, longLiteral);
+	}
+
+	SECTION("move") {
+		vx::String emptyMove {std::move(emptyStr)};
+		isEmpty(emptyStr);
+		isEmpty(emptyMove);
+		vx::String shortMove {std::move(shortStr)};
+		isEmpty(shortStr);
+		isShort(shortMove, shortLiteral);
+		vx::String longMove {std::move(longStr)};
+		isEmpty(longStr);
+		isLong(longMove, longLiteral);
+	}
+
+	SECTION("copy") {
+		vx::String emptyCopy {emptyStr.copy()};
+		isEmpty(emptyStr);
+		isEmpty(emptyCopy);
+		vx::String shortCopy {shortStr.copy()};
+		isShort(shortStr, shortLiteral);
+		isShort(shortCopy, shortLiteral);
+		vx::String longCopy {longStr.copy()};
+		isLong(longStr, longLiteral);
+		isLong(longCopy, longLiteral);
 	}
 }

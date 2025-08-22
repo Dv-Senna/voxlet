@@ -44,6 +44,8 @@ namespace vx::containers {
 
 	constexpr auto String::from(const char8_t* const raw, size_type N) noexcept -> String {
 		String string {};
+		if (N == 0)
+			return string;
 		if (raw[N - 1] == u8'\0')
 			--N;
 		if (N <= SHORT_CAPACITY) {
@@ -52,13 +54,17 @@ namespace vx::containers {
 				string.m_short.data[i] = raw[i];
 			return string;
 		}
-
 		string.m_long.size = (~LONG_SIZE_MASK) | N;
 		string.m_long.capacity = N;
 		string.m_long.data = new value_type[N];
 		for (const auto i : std::views::iota(0uz, N))
 			string.m_long.data[i] = raw[i];
 		return string;
+	}
+
+
+	constexpr auto String::copy() const noexcept -> String {
+		return String::from(this->getData(), this->size());
 	}
 
 

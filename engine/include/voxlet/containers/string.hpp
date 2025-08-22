@@ -25,6 +25,8 @@ namespace vx::containers {
 			static constexpr auto from(const char8_t (&literal)[N]) noexcept -> String;
 			static constexpr auto from(const char8_t* raw, size_type N) noexcept -> String;
 
+			constexpr auto copy() const noexcept -> String;
+
 			constexpr auto empty() const noexcept -> bool;
 			constexpr auto size() const noexcept -> size_type;
 			constexpr auto capacity() const noexcept -> size_type;

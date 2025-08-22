@@ -10,6 +10,8 @@ if (MSVC)
 	message(FATAL_ERROR "MSVC is not supported")
 endif()
 
+option(VOXLET_ENABLE_ADDRESS_SANITIZER "" OFF)
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/dependencies.cmake)
 
 find_package(Catch2)

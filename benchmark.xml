@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Catch2TestRun name="voxlet-benchmarks-containers" rng-seed="659426016" xml-format-version="3" catch2-version="3.9.0">
+  <TestCase name="string - benchmark" tags="[containers]" filename="/home/ayrton/dev/open_source/voxlet/benchmarks/containers/src/string.cpp" line="11">
+    <BenchmarkResults name="[construct from char8_t*] std::u8string - size=0" samples="100" resamples="100000" iterations="377" clockResolution="20.0214" estimatedDuration="1.9981e+06">
+      <!-- All values in nano seconds -->
+      <mean value="53.376" lowerBound="53.3144" upperBound="53.4435" ci="0.95"/>
+      <standardDeviation value="0.329808" lowerBound="0.293601" upperBound="0.376549" ci="0.95"/>
+      <outliers variance="0.0099" lowMild="0" lowSevere="0" highMild="1" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="[construct from char8_t*] vx::String - size=0" samples="100" resamples="100000" iterations="176" clockResolution="20.0214" estimatedDuration="1.9888e+06">
+      <!-- All values in nano seconds -->
+      <mean value="115.061" lowerBound="114.873" upperBound="115.242" ci="0.95"/>
+      <standardDeviation value="0.947418" lowerBound="0.834037" upperBound="1.09538" ci="0.95"/>
+      <outliers variance="0.0099" lowMild="1" lowSevere="0" highMild="0" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="[construct from char8_t*] std::u8string - size=1" samples="100" resamples="100000" iterations="332" clockResolution="20.0214" estimatedDuration="1.992e+06">
+      <!-- All values in nano seconds -->
+      <mean value="60.8779" lowerBound="60.4255" upperBound="61.2751" ci="0.95"/>
+      <standardDeviation value="2.16679" lowerBound="1.91717" upperBound="2.43465" ci="0.95"/>
+      <outliers variance="0.316568" lowMild="0" lowSevere="0" highMild="0" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="[construct from char8_t*] vx::String - size=1" samples="100" resamples="100000" iterations="153" clockResolution="20.0214" estimatedDuration="1.989e+06">
+      <!-- All values in nano seconds -->
+      <mean value="130.783" lowerBound="130.647" upperBound="130.93" ci="0.95"/>
+      <standardDeviation value="0.717303" lowerBound="0.619704" upperBound="0.861287" ci="0.95"/>
+      <outliers variance="0.0099" lowMild="1" lowSevere="0" highMild="2" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="[construct from char8_t*] std::u8string - size=2" samples="100" resamples="100000" iterations="348" clockResolution="20.0214" estimatedDuration="1.9836e+06">
+      <!-- All values in nano seconds -->
+      <mean value="57.7468" lowerBound="57.4945" upperBound="58.154" ci="0.95"/>
+      <standardDeviation value="1.5879" lowerBound="1.02136" upperBound="2.88967" ci="0.95"/>
+      <outliers variance="0.219068" lowMild="6" lowSevere="10" highMild="0" highSevere="2"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="[construct from char8_t*] vx::String - size=2" samples="100" resamples="100000" iterations="151" clockResolution="20.0214" estimatedDuration="2.0083e+06">
+      <!-- All values in nano seconds -->
+      <mean value="133.787" lowerBound="133.522" upperBound="134.66" ci="0.95"/>
+      <standardDeviation value="2.21417" lowerBound="0.814646" upperBound="4.94009" ci="0.95"/>
+      <outliers variance="0.0942954" lowMild="0" lowSevere="0" highMild="1" highSevere="1"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="[construct from char8_t*] std::u8string - size=3" samples="100" resamples="100000" iterations="347" clockResolution="20.0214" estimatedDuration="1.9779e+06">
+      <!-- All values in nano seconds -->
+      <mean value="57.3645" lowerBound="57.079" upperBound="57.5845" ci="0.95"/>
+      <standardDeviation value="1.27253" lowerBound="1.04391" upperBound="1.52516" ci="0.95"/>
+      <outliers variance="0.151871" lowMild="8" lowSevere="6" highMild="0" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="[construct from char8_t*] vx::String - size=3" samples="100" resamples="100000" iterations="147" clockResolution="20.0214" estimatedDuration="1.9992e+06">
+      <!-- All values in nano seconds -->
+      <mean value="137.366" lowerBound="137.074" upperBound="138.294" ci="0.95"/>
+      <standardDeviation value="2.38718" lowerBound="0.925632" upperBound="5.28831" ci="0.95"/>
+      <outliers variance="0.10374" lowMild="0" lowSevere="0" highMild="2" highSevere="1"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="[construct from char8_t*] std::u8string - size=4" samples="100" resamples="100000" iterations="348" clockResolution="20.0214" estimatedDuration="1.9836e+06">
+      <!-- All values in nano seconds -->
+      <mean value="57.1064" lowerBound="56.853" upperBound="57.3065" ci="0.95"/>
+      <standardDeviation value="1.14726" lowerBound="0.941471" upperBound="1.37508" ci="0.95"/>
+      <outliers variance="0.132412" lowMild="8" lowSevere="0" highMild="0" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="[construct from char8_t*] vx::String - size=4" samples="100" resamples="100000" iterations="144" clockResolution="20.0214" estimatedDuration="2.0016e+06">
+      <!-- All values in nano seconds -->
+      <mean value="183.353" lowerBound="140.541" upperBound="354.6" ci="0.95"/>
+      <standardDeviation value="425.366" lowerBound="0.95772" upperBound="931.786" ci="0.95"/>
+      <outliers variance="0.989972" lowMild="0" lowSevere="0" highMild="1" highSevere="1"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="[construct from char8_t*] std::u8string - size=5" samples="100" resamples="100000" iterations="348" clockResolution="20.0214" estimatedDuration="1.9836e+06">
+      <!-- All values in nano seconds -->
+      <mean value="57.9899" lowerBound="57.7234" upperBound="58.3069" ci="0.95"/>
+      <standardDeviation value="1.46831" lowerBound="1.07861" upperBound="2.36072" ci="0.95"/>
+      <outliers variance="0.190251" lowMild="3" lowSevere="15" highMild="0" highSevere="1"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="[construct from char8_t*] vx::String - size=5" samples="100" resamples="100000" iterations="141" clockResolution="20.0214" estimatedDuration="2.0022e+06">
+      <!-- All values in nano seconds -->
+      <mean value="143.753" lowerBound="143.445" upperBound="144.73" ci="0.95"/>
+      <standardDeviation value="2.52602" lowerBound="0.989682" upperBound="5.5955" ci="0.95"/>
+      <outliers variance="0.103877" lowMild="0" lowSevere="0" highMild="0" highSevere="1"/>
+    </BenchmarkResults>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <OverallResults successes="0" failures="0" expectedFailures="0" skips="0"/>
+  <OverallResultsCases successes="1" failures="0" expectedFailures="0" skips="0"/>
+</Catch2TestRun>

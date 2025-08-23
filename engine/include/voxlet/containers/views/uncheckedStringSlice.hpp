@@ -4,8 +4,6 @@
 #include <iterator>
 #include <limits>
 
-#include "voxlet/containers/views/uncheckedContiguousIterator.hpp"
-
 
 namespace vx::containers {
 	class String;
@@ -23,10 +21,8 @@ namespace vx::containers::views {
 			using size_type = std::size_t;
 			static constexpr size_type npos = std::numeric_limits<size_type>::max();
 
-			using iterator = vx::containers::views::UncheckedContiguousIterator<value_type, UncheckedStringSlice>;
-			using const_iterator = vx::containers::views::UncheckedContiguousIterator<
-				const value_type, UncheckedStringSlice
-			>;
+			using iterator = value_type*;
+			using const_iterator = const value_type*;
 			using reverse_iterator = std::reverse_iterator<iterator>;
 			using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 			friend iterator;
@@ -94,6 +90,8 @@ namespace vx::containers::views {
 			value_type* m_begin;
 			value_type* m_end;
 	};
+
+	static_assert(std::ranges::contiguous_range<UncheckedStringSlice>);
 }
 
 #include "voxlet/containers/views/uncheckedStringSlice.inl"

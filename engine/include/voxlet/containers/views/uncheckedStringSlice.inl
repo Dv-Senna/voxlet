@@ -20,10 +20,10 @@ namespace vx::containers::views {
 	}
 
 
-	constexpr auto UncheckedStringSlice::begin() noexcept -> iterator {return iterator{m_begin, *this};}
-	constexpr auto UncheckedStringSlice::end() noexcept -> iterator {return iterator{m_end, *this};}
-	constexpr auto UncheckedStringSlice::cbegin() const noexcept -> const_iterator {return const_iterator{m_begin, *this};}
-	constexpr auto UncheckedStringSlice::cend() const noexcept -> const_iterator {return const_iterator{m_end, *this};}
+	constexpr auto UncheckedStringSlice::begin() noexcept -> iterator {return iterator{m_begin};}
+	constexpr auto UncheckedStringSlice::end() noexcept -> iterator {return iterator{m_end};}
+	constexpr auto UncheckedStringSlice::cbegin() const noexcept -> const_iterator {return const_iterator{m_begin};}
+	constexpr auto UncheckedStringSlice::cend() const noexcept -> const_iterator {return const_iterator{m_end};}
 
 	constexpr auto UncheckedStringSlice::rbegin() noexcept -> reverse_iterator {return reverse_iterator{this->begin()};}
 	constexpr auto UncheckedStringSlice::rend() noexcept -> reverse_iterator {return reverse_iterator{this->end()};}

@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <iterator>
 #include <limits>
+#include <ranges>
 
 #include "voxlet/containers/views/checkedContiguousIterator.hpp"
 #include "voxlet/containers/views/uncheckedStringSlice.hpp"
@@ -103,6 +104,8 @@ namespace vx::containers::views {
 			value_type* m_begin;
 			value_type* m_end;
 	};
+
+	static_assert(std::ranges::contiguous_range<StringSlice>);
 }
 
 #include "voxlet/containers/views/stringSlice.inl"

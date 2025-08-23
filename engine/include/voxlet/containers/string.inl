@@ -76,9 +76,21 @@ namespace vx::containers {
 		return string;
 	}
 
+	constexpr auto String::from(const vx::containers::views::StringSlice& slice) noexcept -> String {
+		return String::from(std::to_address(slice.begin()), slice.getSize());
+	}
+
+	constexpr auto String::from(const vx::containers::views::UncheckedStringSlice& slice) noexcept -> String {
+		return String::from(std::to_address(slice.begin()), slice.getSize());
+	}
+
 
 	constexpr auto String::copy() const noexcept -> String {
 		return String::from(this->getData(), this->getSize());
+	}
+
+	constexpr auto String::slice() const noexcept -> vx::containers::views::StringSlice {
+		return vx::containers::views::StringSlice::from(*this);
 	}
 
 	constexpr auto String::slice(const size_type start, const size_type end) const
@@ -91,15 +103,32 @@ namespace vx::containers {
 		);
 	}
 
+	constexpr auto String::slice(const_iterator start, std::optional<const_iterator> end) const
+		noexcept
+		-> vx::containers::views::StringSlice
+	{
+		assert(start.m_container == this);
+		assert(!end || end->m_container == this);
+		const const_iterator begin {this->begin()};
+		return vx::containers::views::StringSlice::from(*this).slice(
+			start - begin,
+			!!end ? *end - begin : vx::containers::views::StringSlice::npos
+		);
+	}
+
 	constexpr auto String::unchecked() const noexcept -> UncheckedStringSlice {
 		const value_type* const data {this->getData()};
 		return vx::containers::views::UncheckedStringSlice{data, data + this->getSize()};
 	}
 
 
-	constexpr auto String::operator[](size_type index) const noexcept -> value_type {
+	constexpr auto String::operator[](size_type index) noexcept -> value_type& {
 		assert(index < this->getSize());
 		return this->getData()[index];
+	}
+
+	constexpr auto String::operator[](size_type index) const noexcept -> const value_type& {
+		return const_cast<String&> (*this)[index];
 	}
 
 

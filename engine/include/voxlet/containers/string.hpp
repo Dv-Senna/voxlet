@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <iterator>
 #include <limits>
+#include <optional>
 #include <ranges>
 #include <type_traits>
 
@@ -46,18 +47,30 @@ namespace vx::containers {
 			static constexpr auto from(const char8_t (&literal)[N]) noexcept -> String;
 			[[nodiscard]]
 			static constexpr auto from(const char8_t* raw, size_type N) noexcept -> String;
+			[[nodiscard]]
+			static constexpr auto from(const vx::containers::views::StringSlice& slice) noexcept -> String;
+			[[nodiscard]]
+			static constexpr auto from(const vx::containers::views::UncheckedStringSlice& slice) noexcept -> String;
 
 			[[nodiscard]]
 			constexpr auto copy() const noexcept -> String;
 			[[nodiscard]]
+			constexpr auto slice() const noexcept -> vx::containers::views::StringSlice;
+			[[nodiscard]]
 			constexpr auto slice(size_type start, size_type end = npos) const
+				noexcept
+				-> vx::containers::views::StringSlice;
+			[[nodiscard]]
+			constexpr auto slice(const_iterator start, std::optional<const_iterator> end = std::nullopt) const
 				noexcept
 				-> vx::containers::views::StringSlice;
 			[[nodiscard]]
 			constexpr auto unchecked() const noexcept -> UncheckedStringSlice;
 
 			[[nodiscard]]
-			constexpr auto operator[](size_type index) const noexcept -> value_type;
+			constexpr auto operator[](size_type index) noexcept -> value_type&; 
+			[[nodiscard]]
+			constexpr auto operator[](size_type index) const noexcept -> const value_type&; 
 
 			constexpr auto reserve(size_type newCapacity) noexcept -> void;
 			constexpr auto resize(size_type newSize) noexcept -> void;

@@ -110,4 +110,20 @@ TEST_CASE("string", "[containers]") {
 		REQUIRE(std::ranges::equal(shortStr.unchecked(), std::span{shortLiteral, sizeof(shortLiteral) - 1uz}));
 		REQUIRE(std::ranges::equal(longStr.unchecked(), std::span{longLiteral, sizeof(longLiteral) - 1uz}));
 	}
+
+	SECTION("operator[]") {
+		for (const auto i : std::views::iota(0uz, shortStr.size())) {
+			++shortStr[i];
+			REQUIRE(shortStr.unchecked()[i] == shortLiteral[i] + 1);
+		}
+		for (const auto i : std::views::iota(0uz, longStr.size())) {
+			++longStr[i];
+			REQUIRE(longStr.unchecked()[i] == longLiteral[i] + 1);
+		}
+
+		for (const auto i : std::views::iota(0uz, 7uz))
+			REQUIRE(shortStr.slice(3uz, 10uz)[i] == shortLiteral[i + 3uz] + 1);
+		for (const auto i : std::views::iota(0uz, 7uz))
+			REQUIRE(longStr.slice(3uz, 10uz)[i] == longLiteral[i + 3uz] + 1);
+	}
 }

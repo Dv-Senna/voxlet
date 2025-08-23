@@ -3,12 +3,22 @@
 #include <bit>
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <limits>
+#include <ranges>
 #include <type_traits>
 
+#include "voxlet/containers/views/checkedContiguousIterator.hpp"
+
+
+namespace vx::containers::views {
+	class StringSlice;
+}
 
 namespace vx::containers {
 	class String final {
+		friend class vx::containers::views::StringSlice;
+
 		public:
 			String(const String&) = delete;
 			auto operator=(const String&) -> String& = delete;
@@ -16,6 +26,14 @@ namespace vx::containers {
 			using value_type = char8_t;
 			using size_type = std::size_t;
 			using short_size_type = std::uint8_t;
+			static constexpr size_type npos = std::numeric_limits<size_type>::max();
+
+			using iterator = vx::containers::views::CheckedContiguousIterator<value_type, String>;
+			using const_iterator = vx::containers::views::CheckedContiguousIterator<const value_type, String>;
+			using reverse_iterator = std::reverse_iterator<iterator>;
+			using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+			friend iterator;
+			friend const_iterator;
 
 			constexpr String() noexcept;
 			constexpr ~String();
@@ -27,6 +45,9 @@ namespace vx::containers {
 			static constexpr auto from(const char8_t* raw, size_type N) noexcept -> String;
 
 			constexpr auto copy() const noexcept -> String;
+			constexpr auto slice(size_type start, size_type end = npos) const
+				noexcept
+				-> vx::containers::views::StringSlice;
 
 			constexpr auto reserve(size_type newCapacity) noexcept -> void;
 			constexpr auto resize(size_type newSize) noexcept -> void;
@@ -34,6 +55,24 @@ namespace vx::containers {
 			constexpr auto isEmpty() const noexcept -> bool;
 			constexpr auto getSize() const noexcept -> size_type;
 			constexpr auto getCapacity() const noexcept -> size_type;
+
+			constexpr auto begin() noexcept -> iterator;
+			constexpr auto end() noexcept -> iterator;
+			[[gnu::always_inline]]
+			constexpr auto begin() const noexcept -> const_iterator {return this->cbegin();}
+			[[gnu::always_inline]]
+			constexpr auto end() const noexcept -> const_iterator {return this->cend();}
+			constexpr auto cbegin() const noexcept -> const_iterator;
+			constexpr auto cend() const noexcept -> const_iterator;
+
+			constexpr auto rbegin() noexcept -> reverse_iterator;
+			constexpr auto rend() noexcept -> reverse_iterator;
+			[[gnu::always_inline]]
+			constexpr auto rbegin() const noexcept -> const_reverse_iterator {return this->crbegin();}
+			[[gnu::always_inline]]
+			constexpr auto rend() const noexcept -> const_reverse_iterator {return this->crend();}
+			constexpr auto crbegin() const noexcept -> const_reverse_iterator;
+			constexpr auto crend() const noexcept -> const_reverse_iterator;
 
 			[[gnu::always_inline]]
 			constexpr auto empty() const noexcept -> bool {return this->isEmpty();}
@@ -46,6 +85,9 @@ namespace vx::containers {
 	#ifdef VOXLET_CONTAINERS_STRING_EXPOSE_PRIVATE
 		public:
 	#endif
+			constexpr auto isPointerValid(const value_type* ptr) const noexcept -> bool;
+			constexpr auto isPointerEnd(const value_type* ptr) const noexcept -> bool;
+
 			constexpr auto isShort() const noexcept -> bool;
 			constexpr auto getData() noexcept -> value_type*;
 			constexpr auto getData() const noexcept -> const value_type*;
@@ -98,6 +140,8 @@ namespace vx::containers {
 				std::byte m_raw[FOOTPRINT];
 			};
 	};
+
+	static_assert(std::ranges::contiguous_range<String>);
 }
 
 #include "voxlet/containers/string.inl"

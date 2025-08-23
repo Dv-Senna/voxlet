@@ -9,6 +9,7 @@
 #include <print>
 #include <ranges>
 
+#include "voxlet/containers/views/stringSlice.hpp"
 #include "voxlet/memory.hpp"
 
 
@@ -80,6 +81,16 @@ namespace vx::containers {
 		return String::from(this->getData(), this->getSize());
 	}
 
+	constexpr auto String::slice(const size_type start, const size_type end) const
+		noexcept
+		-> vx::containers::views::StringSlice
+	{
+		return vx::containers::views::StringSlice::from(*this).slice(
+			start,
+			end == npos ? vx::containers::views::StringSlice::npos : end
+		);
+	}
+
 
 	constexpr auto String::reserve(const size_type newCapacity) noexcept -> void {
 		if !consteval {
@@ -125,6 +136,38 @@ namespace vx::containers {
 		return m_long.capacity;
 	}
 
+
+	constexpr auto String::begin() noexcept -> iterator {return iterator{this->getData(), *this};}
+	constexpr auto String::end() noexcept -> iterator {return iterator{this->getData() + this->getSize(), *this};}
+	constexpr auto String::cbegin() const noexcept -> const_iterator {return const_iterator{this->getData(), *this};}
+	constexpr auto String::cend() const noexcept -> const_iterator {
+		return const_iterator{this->getData() + this->getSize(), *this};
+	}
+
+	constexpr auto String::rbegin() noexcept -> reverse_iterator {
+		return reverse_iterator{iterator{this->getData(), *this}};
+	}
+	constexpr auto String::rend() noexcept -> reverse_iterator {
+		return reverse_iterator{iterator{this->getData() + this->getSize(), *this}};
+	}
+	constexpr auto String::crbegin() const noexcept -> const_reverse_iterator {
+		return const_reverse_iterator{const_iterator{this->getData(), *this}};
+	}
+	constexpr auto String::crend() const noexcept -> const_reverse_iterator {
+		return const_reverse_iterator{const_iterator{this->getData() + this->getSize(), *this}};
+	}
+
+
+	constexpr auto String::isPointerValid(const value_type* ptr) const noexcept -> bool {
+		const value_type* const data {this->getData()};
+		return ptr >= data && ptr < data + this->getSize();
+	}
+
+	constexpr auto String::isPointerEnd(const value_type* ptr) const noexcept -> bool {
+		return ptr == this->getData() + this->getSize();
+	}
+
+
 	constexpr auto String::isShort() const noexcept -> bool {
 		if consteval {
 			return false;
@@ -136,7 +179,6 @@ namespace vx::containers {
 				return (m_raw[0uz] & IS_SHORT_MASK) == static_cast<std::byte> (0);
 		}
 	}
-
 
 	constexpr auto String::getData() noexcept -> value_type* {
 		if (this->isShort())

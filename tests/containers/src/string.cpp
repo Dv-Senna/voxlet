@@ -81,4 +81,21 @@ TEST_CASE("string", "[containers]") {
 		isLong(longStr, longLiteral);
 		isLong(longCopy, longLiteral);
 	}
+
+	SECTION("iteration") {
+		for (auto& c : emptyStr)
+			++c;
+		for (auto& c : shortStr)
+			++c;
+		for (auto& c : longStr)
+			++c;
+
+		REQUIRE(std::ranges::equal(emptyStr, std::vector<char8_t> {}));
+		REQUIRE(std::ranges::equal(shortStr, std::span{shortLiteral, sizeof(shortLiteral) - 1uz}
+			| std::views::transform([](const auto c) {return c + 1;})
+		));
+		REQUIRE(std::ranges::equal(longStr, std::span{longLiteral, sizeof(longLiteral) - 1uz}
+			| std::views::transform([](const auto c) {return c + 1;})
+		));
+	}
 }

@@ -4,8 +4,7 @@
 #include <iterator>
 #include <limits>
 
-#include "voxlet/containers/views/checkedContiguousIterator.hpp"
-#include "voxlet/containers/views/uncheckedStringSlice.hpp"
+#include "voxlet/containers/views/uncheckedContiguousIterator.hpp"
 
 
 namespace vx::containers {
@@ -13,38 +12,35 @@ namespace vx::containers {
 }
 
 namespace vx::containers::views {
-	class StringSlice final {
+	class StringSlice;
+
+	class UncheckedStringSlice final {
+		friend class vx::containers::String;
+		friend class vx::containers::views::StringSlice;
+
 		public:
 			using value_type = const char8_t;
 			using size_type = std::size_t;
 			static constexpr size_type npos = std::numeric_limits<size_type>::max();
 
-			using iterator = vx::containers::views::CheckedContiguousIterator<value_type, StringSlice>;
-			using const_iterator = vx::containers::views::CheckedContiguousIterator<const value_type, StringSlice>;
+			using iterator = vx::containers::views::UncheckedContiguousIterator<value_type, UncheckedStringSlice>;
+			using const_iterator = vx::containers::views::UncheckedContiguousIterator<
+				const value_type, UncheckedStringSlice
+			>;
 			using reverse_iterator = std::reverse_iterator<iterator>;
 			using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 			friend iterator;
 			friend const_iterator;
 
-			constexpr StringSlice() noexcept = default;
-			constexpr ~StringSlice() = default;
-			constexpr StringSlice(const StringSlice&) noexcept = default;
-			constexpr auto operator=(const StringSlice&) noexcept -> StringSlice& = default;
-			constexpr StringSlice(StringSlice&&) noexcept = default;
-			constexpr auto operator=(StringSlice&&) noexcept -> StringSlice& = default;
-
-			template <std::size_t N>
-			[[nodiscard]]
-			static constexpr auto from(const char8_t (&literal)[N]) noexcept -> StringSlice;
-			[[nodiscard]]
-			static constexpr auto from(const char8_t* raw, std::size_t N) noexcept -> StringSlice;
-			[[nodiscard]]
-			static constexpr auto from(const vx::containers::String& string) noexcept -> StringSlice;
+			constexpr UncheckedStringSlice() noexcept = default;
+			constexpr ~UncheckedStringSlice() = default;
+			constexpr UncheckedStringSlice(const UncheckedStringSlice&) noexcept = default;
+			constexpr auto operator=(const UncheckedStringSlice&) noexcept -> UncheckedStringSlice& = default;
+			constexpr UncheckedStringSlice(UncheckedStringSlice&&) noexcept = default;
+			constexpr auto operator=(UncheckedStringSlice&&) noexcept -> UncheckedStringSlice& = default;
 
 			[[nodiscard]]
-			constexpr auto slice(size_type start, size_type end = npos) const noexcept -> StringSlice;
-			[[nodiscard]]
-			constexpr auto unchecked() const noexcept -> UncheckedStringSlice;
+			constexpr auto slice(size_type start, size_type end = npos) const noexcept -> UncheckedStringSlice;
 
 			[[nodiscard]]
 			constexpr auto operator[](size_type index) const noexcept -> std::remove_const_t<value_type>;
@@ -93,20 +89,15 @@ namespace vx::containers::views {
 
 
 		private:
-			constexpr StringSlice(value_type* begin, value_type* end) noexcept;
-
-			[[nodiscard]]
-			constexpr auto isPointerValid(const value_type* ptr) const noexcept -> bool;
-			[[nodiscard]]
-			constexpr auto isPointerEnd(const value_type* ptr) const noexcept -> bool;
+			constexpr UncheckedStringSlice(value_type* begin, value_type* end) noexcept;
 
 			value_type* m_begin;
 			value_type* m_end;
 	};
 }
 
-#include "voxlet/containers/views/stringSlice.inl"
+#include "voxlet/containers/views/uncheckedStringSlice.inl"
 
 namespace vx {
-	using ::vx::containers::views::StringSlice;
+	using ::vx::containers::views::UncheckedStringSlice;
 }

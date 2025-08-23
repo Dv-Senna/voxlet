@@ -91,6 +91,17 @@ namespace vx::containers {
 		);
 	}
 
+	constexpr auto String::unchecked() const noexcept -> UncheckedStringSlice {
+		const value_type* const data {this->getData()};
+		return vx::containers::views::UncheckedStringSlice{data, data + this->getSize()};
+	}
+
+
+	constexpr auto String::operator[](size_type index) const noexcept -> value_type {
+		assert(index < this->getSize());
+		return this->getData()[index];
+	}
+
 
 	constexpr auto String::reserve(const size_type newCapacity) noexcept -> void {
 		if !consteval {
@@ -144,17 +155,13 @@ namespace vx::containers {
 		return const_iterator{this->getData() + this->getSize(), *this};
 	}
 
-	constexpr auto String::rbegin() noexcept -> reverse_iterator {
-		return reverse_iterator{iterator{this->getData(), *this}};
-	}
-	constexpr auto String::rend() noexcept -> reverse_iterator {
-		return reverse_iterator{iterator{this->getData() + this->getSize(), *this}};
-	}
+	constexpr auto String::rbegin() noexcept -> reverse_iterator {return reverse_iterator{this->begin()};}
+	constexpr auto String::rend() noexcept -> reverse_iterator {return reverse_iterator{this->end()};}
 	constexpr auto String::crbegin() const noexcept -> const_reverse_iterator {
-		return const_reverse_iterator{const_iterator{this->getData(), *this}};
+		return const_reverse_iterator{this->cbegin()};
 	}
 	constexpr auto String::crend() const noexcept -> const_reverse_iterator {
-		return const_reverse_iterator{const_iterator{this->getData() + this->getSize(), *this}};
+		return const_reverse_iterator{this->cend()};
 	}
 
 

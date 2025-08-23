@@ -98,4 +98,16 @@ TEST_CASE("string", "[containers]") {
 			| std::views::transform([](const auto c) {return c + 1;})
 		));
 	}
+
+	SECTION("sliced iteration") {
+		REQUIRE(std::ranges::equal(emptyStr.slice(0uz), std::vector<char8_t> {}));
+		REQUIRE(std::ranges::equal(shortStr.slice(3uz, 10uz), std::span{shortLiteral + 3uz, 7uz}));
+		REQUIRE(std::ranges::equal(longStr.slice(3uz, 10uz), std::span{longLiteral + 3uz, 7uz}));
+	}
+
+	SECTION("unchecked iteration") {
+		REQUIRE(std::ranges::equal(emptyStr.unchecked(), std::vector<char8_t> {}));
+		REQUIRE(std::ranges::equal(shortStr.unchecked(), std::span{shortLiteral, sizeof(shortLiteral) - 1uz}));
+		REQUIRE(std::ranges::equal(longStr.unchecked(), std::span{longLiteral, sizeof(longLiteral) - 1uz}));
+	}
 }

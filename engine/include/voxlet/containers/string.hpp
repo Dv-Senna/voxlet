@@ -9,6 +9,7 @@
 #include <type_traits>
 
 #include "voxlet/containers/views/checkedContiguousIterator.hpp"
+#include "voxlet/containers/views/uncheckedStringSlice.hpp"
 
 
 namespace vx::containers::views {
@@ -41,43 +42,70 @@ namespace vx::containers {
 			constexpr auto operator=(String&& other) noexcept -> String&;
 
 			template <size_type N>
+			[[nodiscard]]
 			static constexpr auto from(const char8_t (&literal)[N]) noexcept -> String;
+			[[nodiscard]]
 			static constexpr auto from(const char8_t* raw, size_type N) noexcept -> String;
 
+			[[nodiscard]]
 			constexpr auto copy() const noexcept -> String;
+			[[nodiscard]]
 			constexpr auto slice(size_type start, size_type end = npos) const
 				noexcept
 				-> vx::containers::views::StringSlice;
+			[[nodiscard]]
+			constexpr auto unchecked() const noexcept -> UncheckedStringSlice;
+
+			[[nodiscard]]
+			constexpr auto operator[](size_type index) const noexcept -> value_type;
 
 			constexpr auto reserve(size_type newCapacity) noexcept -> void;
 			constexpr auto resize(size_type newSize) noexcept -> void;
 
+			[[nodiscard]]
 			constexpr auto isEmpty() const noexcept -> bool;
+			[[nodiscard]]
 			constexpr auto getSize() const noexcept -> size_type;
+			[[nodiscard]]
 			constexpr auto getCapacity() const noexcept -> size_type;
 
+			[[nodiscard]]
 			constexpr auto begin() noexcept -> iterator;
+			[[nodiscard]]
 			constexpr auto end() noexcept -> iterator;
+			[[nodiscard]]
 			[[gnu::always_inline]]
 			constexpr auto begin() const noexcept -> const_iterator {return this->cbegin();}
+			[[nodiscard]]
 			[[gnu::always_inline]]
 			constexpr auto end() const noexcept -> const_iterator {return this->cend();}
+			[[nodiscard]]
 			constexpr auto cbegin() const noexcept -> const_iterator;
+			[[nodiscard]]
 			constexpr auto cend() const noexcept -> const_iterator;
 
+			[[nodiscard]]
 			constexpr auto rbegin() noexcept -> reverse_iterator;
+			[[nodiscard]]
 			constexpr auto rend() noexcept -> reverse_iterator;
+			[[nodiscard]]
 			[[gnu::always_inline]]
 			constexpr auto rbegin() const noexcept -> const_reverse_iterator {return this->crbegin();}
+			[[nodiscard]]
 			[[gnu::always_inline]]
 			constexpr auto rend() const noexcept -> const_reverse_iterator {return this->crend();}
+			[[nodiscard]]
 			constexpr auto crbegin() const noexcept -> const_reverse_iterator;
+			[[nodiscard]]
 			constexpr auto crend() const noexcept -> const_reverse_iterator;
 
+			[[nodiscard]]
 			[[gnu::always_inline]]
 			constexpr auto empty() const noexcept -> bool {return this->isEmpty();}
+			[[nodiscard]]
 			[[gnu::always_inline]]
 			constexpr auto size() const noexcept -> size_type {return this->getSize();}
+			[[nodiscard]]
 			[[gnu::always_inline]]
 			constexpr auto capacity() const noexcept -> size_type {return this->getCapacity();}
 
@@ -85,11 +113,16 @@ namespace vx::containers {
 	#ifdef VOXLET_CONTAINERS_STRING_EXPOSE_PRIVATE
 		public:
 	#endif
+			[[nodiscard]]
 			constexpr auto isPointerValid(const value_type* ptr) const noexcept -> bool;
+			[[nodiscard]]
 			constexpr auto isPointerEnd(const value_type* ptr) const noexcept -> bool;
 
+			[[nodiscard]]
 			constexpr auto isShort() const noexcept -> bool;
+			[[nodiscard]]
 			constexpr auto getData() noexcept -> value_type*;
+			[[nodiscard]]
 			constexpr auto getData() const noexcept -> const value_type*;
 
 			constexpr auto setSize(size_type size) noexcept -> void;

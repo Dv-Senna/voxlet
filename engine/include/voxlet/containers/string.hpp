@@ -15,6 +15,7 @@ namespace vx::containers {
 
 			using value_type = char8_t;
 			using size_type = std::size_t;
+			using short_size_type = std::uint8_t;
 
 			constexpr String() noexcept;
 			constexpr ~String();
@@ -27,9 +28,19 @@ namespace vx::containers {
 
 			constexpr auto copy() const noexcept -> String;
 
-			constexpr auto empty() const noexcept -> bool;
-			constexpr auto size() const noexcept -> size_type;
-			constexpr auto capacity() const noexcept -> size_type;
+			constexpr auto reserve(size_type newCapacity) noexcept -> void;
+			constexpr auto resize(size_type newSize) noexcept -> void;
+
+			constexpr auto isEmpty() const noexcept -> bool;
+			constexpr auto getSize() const noexcept -> size_type;
+			constexpr auto getCapacity() const noexcept -> size_type;
+
+			[[gnu::always_inline]]
+			constexpr auto empty() const noexcept -> bool {return this->isEmpty();}
+			[[gnu::always_inline]]
+			constexpr auto size() const noexcept -> size_type {return this->getSize();}
+			[[gnu::always_inline]]
+			constexpr auto capacity() const noexcept -> size_type {return this->getCapacity();}
 
 		private:
 	#ifdef VOXLET_CONTAINERS_STRING_EXPOSE_PRIVATE
@@ -39,14 +50,16 @@ namespace vx::containers {
 			constexpr auto getData() noexcept -> value_type*;
 			constexpr auto getData() const noexcept -> const value_type*;
 
+			constexpr auto setSize(size_type size) noexcept -> void;
+
 			static constexpr std::size_t FOOTPRINT {3uz*sizeof(size_type)};
-			static constexpr std::size_t SHORT_CAPACITY {FOOTPRINT / sizeof(char8_t) - sizeof(std::uint8_t)};
+			static constexpr std::size_t SHORT_CAPACITY {FOOTPRINT / sizeof(value_type) - sizeof(short_size_type)};
 			static constexpr auto IS_SHORT_MASK {static_cast<std::byte> (0b1000'0000)};
 			static constexpr std::size_t LONG_SIZE_MASK {~(static_cast<size_type> (1)
 				<< (8uz * sizeof(size_type) - 1uz)
 			)};
 
-			static_assert(SHORT_CAPACITY <= std::numeric_limits<std::uint8_t>::max());
+			static_assert(SHORT_CAPACITY <= std::numeric_limits<short_size_type>::max());
 
 			struct LongBigEndian {
 				size_type size;
@@ -55,7 +68,7 @@ namespace vx::containers {
 			};
 
 			struct ShortBigEndian {
-				std::uint8_t size;
+				short_size_type size;
 				value_type data[SHORT_CAPACITY];
 			};
 
@@ -67,7 +80,7 @@ namespace vx::containers {
 
 			struct ShortLittleEndian {
 				value_type data[SHORT_CAPACITY];
-				std::uint8_t size;
+				short_size_type size;
 			};
 
 			using Long = std::conditional_t<std::endian::native == std::endian::little,

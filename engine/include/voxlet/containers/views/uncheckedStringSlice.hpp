@@ -95,7 +95,3 @@ namespace vx::containers::views {
 }
 
 #include "voxlet/containers/views/uncheckedStringSlice.inl"
-
-namespace vx {
-	using ::vx::containers::views::UncheckedStringSlice;
-}

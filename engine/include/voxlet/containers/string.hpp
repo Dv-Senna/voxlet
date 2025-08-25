@@ -65,7 +65,7 @@ namespace vx::containers {
 				noexcept
 				-> vx::containers::views::StringSlice;
 			[[nodiscard]]
-			constexpr auto unchecked() const noexcept -> UncheckedStringSlice;
+			constexpr auto unchecked() const noexcept -> vx::containers::views::UncheckedStringSlice;
 
 			[[nodiscard]]
 			constexpr auto operator[](size_type index) noexcept -> value_type&; 

@@ -116,7 +116,7 @@ namespace vx::containers {
 		);
 	}
 
-	constexpr auto String::unchecked() const noexcept -> UncheckedStringSlice {
+	constexpr auto String::unchecked() const noexcept -> vx::containers::views::UncheckedStringSlice {
 		const value_type* const data {this->getData()};
 		return vx::containers::views::UncheckedStringSlice{data, data + this->getSize()};
 	}

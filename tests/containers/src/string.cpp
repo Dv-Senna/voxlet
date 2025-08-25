@@ -1,3 +1,4 @@
+#include <iterator>
 #include <ranges>
 
 #include <catch2/catch_test_macros.hpp>
@@ -6,6 +7,7 @@
 
 #define VOXLET_CONTAINERS_STRING_EXPOSE_PRIVATE
 #include <voxlet/containers/string.hpp>
+#include <voxlet/containers/stringAccumulator.hpp>
 
 
 auto isEmpty(const vx::String& str) -> void {
@@ -44,7 +46,7 @@ auto isEqual(const vx::String& lhs, const vx::String& rhs) -> void {
 }
 
 
-TEST_CASE("string", "[containers]") {
+TEST_CASE("string", "[string][containers]") {
 	const char8_t shortLiteral[] {u8"Hello World!"};
 	const char8_t longLiteral[] {u8"Hello World! I really want this string to be non-SSO, so its long"};
 
@@ -126,4 +128,86 @@ TEST_CASE("string", "[containers]") {
 		for (const auto i : std::views::iota(0uz, 7uz))
 			REQUIRE(longStr.slice(3uz, 10uz)[i] == longLiteral[i + 3uz] + 1);
 	}
+}
+
+
+
+TEST_CASE("string-accumulator", "[string][containers]") {
+	static const char8_t VALID_CHARACTERS[] {u8"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"};
+
+	const std::size_t size {GENERATE(128, 1024, 2048)};
+
+	auto characterRandomGenerator {Catch::Generators::random(0uz, sizeof(VALID_CHARACTERS) - 2uz)};
+	const auto stringContent = std::views::repeat(0, size)
+		| std::views::transform([&characterRandomGenerator](auto) {
+			const std::size_t index {characterRandomGenerator.get()};
+			(void)characterRandomGenerator.next();
+			return VALID_CHARACTERS[index];
+		})
+		| std::ranges::to<std::vector> ();
+
+	const std::size_t averageSizePerPart {size / 5uz};
+	auto sizeRandomGenerator {Catch::Generators::random(
+		averageSizePerPart * 9uz / 10uz,
+		averageSizePerPart * 11uz / 10uz
+	)};
+	std::size_t sizeUsed {};
+	auto generateNewSize = [&sizeRandomGenerator] {
+		const std::size_t size {sizeRandomGenerator.get()};
+		(void)sizeRandomGenerator.next();
+		return size;
+	};
+
+	std::size_t partSize {generateNewSize()};
+	const std::u8string stdu8string {std::from_range, stringContent | std::views::take(partSize)};
+	sizeUsed += partSize;
+	partSize = generateNewSize();
+	const auto string {vx::String::from(std::to_address(stringContent.begin() + sizeUsed), partSize)};
+	sizeUsed += partSize;
+	partSize = generateNewSize();
+	const auto stringSlice {vx::String::from(std::to_address(stringContent.begin() + sizeUsed), partSize)};
+	sizeUsed += partSize;
+	partSize = generateNewSize();
+	std::size_t contiguousTakeWhileSize {partSize};
+	const auto contiguousNotSizedString {
+		std::span{std::to_address(stringContent.begin() + sizeUsed), size - sizeUsed}
+		| std::views::take_while([&contiguousTakeWhileSize](auto) {
+			return contiguousTakeWhileSize-- != 0uz;
+		})
+	};
+	sizeUsed += partSize;
+	std::println("sizeUsed: {}/{}", sizeUsed, size);
+
+	struct InputIterator {
+		using difference_type = std::ptrdiff_t;
+		using value_type = char8_t;
+		inline auto operator==(const std::default_sentinel_t&) const noexcept -> bool {return index == size;}
+		inline auto operator++() noexcept -> InputIterator& {++index; return *this;}
+		inline auto operator++(int) noexcept -> InputIterator {++index; return *this;}
+		inline auto operator*() const noexcept -> char8_t {return value[index];}
+		const char8_t* value;
+		std::size_t index;
+		std::size_t size;
+	};
+	static_assert(std::input_iterator<InputIterator>);
+
+	auto inputRange {std::ranges::subrange(
+		InputIterator{
+			std::to_address(stringContent.begin() + sizeUsed),
+			0uz,
+			size - sizeUsed
+		},
+		std::default_sentinel
+	)};
+
+	vx::containers::StringAccumulator accumulator {};
+	accumulator += stdu8string;
+	accumulator += string;
+	accumulator += stringSlice;
+	accumulator += contiguousNotSizedString;
+	accumulator += inputRange;
+
+	const auto accumulatorString {accumulator.toString()};
+
+	REQUIRE(std::ranges::equal(accumulatorString, stringContent));
 }

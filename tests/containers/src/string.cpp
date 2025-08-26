@@ -135,10 +135,9 @@ TEST_CASE("string", "[string][containers]") {
 TEST_CASE("string-accumulator", "[string][containers]") {
 	static const char8_t VALID_CHARACTERS[] {u8"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"};
 
-	const std::size_t size {GENERATE(128, 1024, 2048)};
-
+	const std::size_t size {GENERATE(128, 1024, 2048, 18739)};
 	auto characterRandomGenerator {Catch::Generators::random(0uz, sizeof(VALID_CHARACTERS) - 2uz)};
-	const auto stringContent = std::views::repeat(0, size)
+	auto stringContent = std::views::repeat(0, size)
 		| std::views::transform([&characterRandomGenerator](auto) {
 			const std::size_t index {characterRandomGenerator.get()};
 			(void)characterRandomGenerator.next();
@@ -168,15 +167,14 @@ TEST_CASE("string-accumulator", "[string][containers]") {
 	const auto stringSlice {vx::String::from(std::to_address(stringContent.begin() + sizeUsed), partSize)};
 	sizeUsed += partSize;
 	partSize = generateNewSize();
-	std::size_t contiguousTakeWhileSize {partSize};
+	stringContent[sizeUsed + partSize] = u8'!';
 	const auto contiguousNotSizedString {
 		std::span{std::to_address(stringContent.begin() + sizeUsed), size - sizeUsed}
-		| std::views::take_while([&contiguousTakeWhileSize](auto) {
-			return contiguousTakeWhileSize-- != 0uz;
+		| std::views::take_while([](char8_t c) {
+			return c != u8'!';
 		})
 	};
 	sizeUsed += partSize;
-	std::println("sizeUsed: {}/{}", sizeUsed, size);
 
 	struct InputIterator {
 		using difference_type = std::ptrdiff_t;
@@ -208,6 +206,5 @@ TEST_CASE("string-accumulator", "[string][containers]") {
 	accumulator += inputRange;
 
 	const auto accumulatorString {accumulator.toString()};
-
 	REQUIRE(std::ranges::equal(accumulatorString, stringContent));
 }

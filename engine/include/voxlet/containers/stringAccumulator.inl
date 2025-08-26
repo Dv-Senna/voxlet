@@ -129,16 +129,16 @@ namespace vx::containers {
 	constexpr auto BasicStringAccumulator<bufferSize, hasInnerStorage>::push(Range&& range) noexcept -> void {
 		auto begin {std::ranges::begin(std::forward<Range> (range))};
 		const auto end {std::ranges::end(std::forward<Range> (range))};
-		std::size_t remainingSize {bufferSize - (m_size % bufferSize)};
+		const std::size_t lastSegmentSize {m_size % bufferSize};
+		std::size_t remainingSize {bufferSize - lastSegmentSize};
 		while (begin != end) {
 			auto localEnd {begin};
 			const auto rangeSegmentSize {
 				remainingSize - static_cast<std::size_t> (std::ranges::advance(localEnd, remainingSize, end))
 			};
-			std::println("rangeSegmentSize: {}", rangeSegmentSize);
 			const auto [data, _] {this->reserveMaxOneSegment()};
-			(void)std::ranges::copy(std::ranges::subrange{begin, localEnd}, data);
-			this->resizeMaxOneSegmentBy(rangeSegmentSize);
+			vx::memory::memcpy(data, std::to_address(begin), rangeSegmentSize);
+			(void)this->resizeMaxOneSegmentBy(rangeSegmentSize);
 			remainingSize = bufferSize;
 			begin = localEnd;
 		}
